@@ -1,0 +1,94 @@
+.task {
+	
+	width: 250px;
+	box-sizing: border-box;
+	border-style: solid;
+	border-width: 1px;
+	border-color: #222;
+	display: inline-block;
+	margin: 0px;
+	margin-right: 10px;
+	margin-left: 5px;
+	overflow: hidden;
+	word-wrap: break-word;
+	overflow-wrap: break-word;
+	padding-left: 5px;
+	
+}
+
+.task-min {
+	
+	margin-top: 20px;
+	height: 30px;
+	line-height: 28px;
+	background-color: #abf;
+	
+}
+
+.task-blur {
+	
+	height: 50px;
+	line-height: 48px;
+	background-color: #abf;
+	
+}
+
+.task-focus {
+	
+	height: 50px;
+	line-height: 48px;
+	background-color: #7af;
+	
+}
+
+#taskbar.min-all .task {
+	
+	margin-top: 20px !important;
+	height: 30px !important;
+	line-height: 28px !important;
+	background-color: #abf !important;
+	
+}
+
+#taskbar {
+	
+	padding: 0px;
+	margin: 0px;
+	
+}
+
+#down_button {
+	
+	height: 25px;
+	width: 50px;
+	padding: 12.5px;
+	margin: 0px;
+	transform: rotateX(0deg);
+	transition: transform 1s;
+	background-image: url('down.png');
+	background-position: center center;
+	background-repeat: no-repeat;
+	background-size: 45px auto;
+	display: inline-block;
+	
+}
+
+.arrow-button {
+	
+	transform: rotateX(0deg);
+	transition: transform 1s;
+	background-image: url('up-white.png');
+	background-position: center center;
+	background-repeat: no-repeat;
+	background-size: 85% auto;
+	display: inline-block;
+	height: 100%;
+	width: 100%;
+	
+}
+
+.acc-up-button {
+	
+	transform: rotateX(180deg) !important;
+	
+}

@@ -1,0 +1,77 @@
+<html>
+<head>
+<title>
+Text Edit
+</title>
+</head>
+<body>
+	<input type="text" ID="path" placeholder="File Path"><button type="button" ID="read">Read</button><button type="button" ID="write">Write</button>
+	<textarea ID="editor"></textarea>
+	<script type="text/javascript">
+		
+		let fs = require("fs") ;
+		
+		let path = document.getElementById("path") ;
+		let read = document.getElementById("read") ;
+		let write = document.getElementById("write") ;
+		let editor = document.getElementById("editor") ;
+		
+		function conf(t) {
+			
+			return new Promise(resolve=>resolve(confirm(t))) ;
+			
+		}
+		
+		read.addEventListener("click",_=>{
+			
+			let reading = path.value ;
+			conf("Read "+reading+"?").then(d=>{
+				
+				if (d) {
+					
+					fs.readFile(reading,(err,data)=>{
+						
+						if (err) {
+							
+							editor.value = `Error occured while reading ${reading}:\r\n${err}` ;
+							return ;
+							
+						}
+						
+						editor.value = data.toString() ;
+						
+					}) ;
+					
+				}
+				
+			}) ;
+			
+		}) ;
+		
+		write.addEventListener("click",_=>{
+			
+			let writing = path.value ;
+			conf("Write to "+writing+"?").then(d=>{
+				
+				if (d) {
+					
+					fs.writeFile(writing,editor.value,err=>{
+						
+						if (err) {
+							
+							alert("Write error:") ;
+							alert(err) ;
+							
+						}
+						
+					}) ;
+					
+				}
+				
+			}) ;
+			
+		}) ;
+		
+	</script>
+</body>
+</html>

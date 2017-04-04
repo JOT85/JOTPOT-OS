@@ -1,0 +1,174 @@
+<html>
+	<head>
+		<title>
+			File Manager
+		</title>
+		<style>
+			
+			.item {
+				
+				background-color: #bbb;
+				padding: 3px;
+				padding-left: 30px;
+				background-repeat: no-repeat;
+				height: 25px;
+				display: block;
+				background-position: 5px center;
+				line-height: 25px;
+				
+			}
+			
+			.item:hover {
+				
+				background-color: #ccc;
+				
+			}
+			
+			.dir {
+				
+				background-image: url('dir.png');
+				background-size: 20px auto;
+				
+			}
+			
+			.file-err {
+				
+				background-image: url('x.png');
+				background-size: 20px 20px;
+				
+			}
+			
+			.file {
+				
+				background-image: url('file.png');
+				background-size: auto 17.5px;
+				
+			}
+			
+			html,body {
+				
+				background-color: white;
+				margin: 0px;
+				padding: 0px;
+				
+			}
+			
+		</style>
+	</head>
+	<body>
+		<ul ID="list"></ul>
+		<script type="text/javascript">
+			
+			let currentDir = "/" ;
+			let fs = require("fs") ;
+			let path = require("path") ;
+			
+			let list = document.getElementById("list") ;
+			
+			function giveMeErrors(err) {
+				
+				throw new Error(err) ;
+				
+			}
+			
+			function renderDir(d) {
+				
+				console.log("Rendering",d) ;
+				list.innerHTML = "" ;
+				fs.readdir(d,(err,dir)=>{
+					
+					if (err) {
+						
+						giveMeErrors(err) ;
+						return ;
+						
+					}
+					
+					console.log("DIR contents:",dir) ;
+					let x = new Array() ;
+					let dirs = new Array() ;
+					let files = new Array() ;
+					
+					let doing = -1 ;
+					
+					let next =_=> {
+						
+						doing++ ;
+						if (doing >= dir.length) {
+							
+							for (let doing in x) {
+								
+								let creating = document.createElement("li") ;
+								creating.classList.add("item") ;
+								creating.classList.add("file-err") ;
+								creating.innerText = x[doing] ;
+								list.appendChild(creating) ;
+								
+							}
+							for (let doing in dirs) {
+								
+								let creating = document.createElement("li") ;
+								creating.classList.add("item") ;
+								creating.classList.add("dir") ;
+								creating.innerText = dirs[doing] ;
+								creating.addEventListener("click",_=>{
+									
+									currentDir = path.join(d,dirs[doing]) ;
+									renderDir(currentDir) ;
+									
+								}) ;
+								list.appendChild(creating) ;
+								
+							}
+							for (let doing in files) {
+								
+								let creating = document.createElement("li") ;
+								creating.classList.add("item") ;
+								creating.classList.add("file") ;
+								creating.innerText = files[doing] ;
+								list.appendChild(creating) ;
+								
+							}
+							return ;
+							
+						}
+						
+						fs.stat(path.join(d,dir[doing]),(err,stats)=>{
+							
+							if (err) {
+								
+								x.push(dir[doing]) ;
+								next() ;
+								giveMeErrors(err) ;
+								return ;
+								
+							}
+							
+							else if (stats.isDirectory()) {
+								
+								dirs.push(dir[doing]) ;
+								
+							}
+							
+							else {
+								
+								files.push(dir[doing]) ;
+								
+							}
+							
+							next() ;
+							
+						}) ;
+						
+					} ;
+					next() ;
+					
+				}) ;
+				
+			}
+			
+			renderDir(currentDir) ;
+			
+		</script>
+	</body>
+</html>

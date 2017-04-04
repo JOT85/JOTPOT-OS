@@ -1,0 +1,51 @@
+.app {
+	
+	display: inline-block;
+	margin: 15px;
+	width: 85px;
+	height: 85px;
+	background-color: rgba(25,100,250,0.2);
+	background-position: center 8px;
+	background-size: auto 35px;
+	background-repeat: no-repeat;
+	
+}
+
+.app:hover {
+	
+	background-color: rgba(25,100,250,0.5);
+	
+}
+
+.app-label {
+	
+	position: relative;
+	left: 0px;
+	bottom: -82px;
+	transform: translateY(-100%);
+	height: auto;
+	width: 100%;
+	color: white;
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 1em;
+	text-align: center;
+	
+}
+
+#debugmode {
+	
+	display: block;
+	position: absolute;
+	bottom: 0px;
+	left: calc(50vw - 90px);
+	
+}
+
+#exit {
+	
+	display: block;
+	position: absolute;
+	bottom: 0px;
+	left: calc(50vw + 5px);
+	
+}

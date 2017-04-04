@@ -1,0 +1,21 @@
+[
+	
+	{
+		
+		"name":"Scougall Chrome",
+		"icon":"../scougall-chrome/s.png",
+		"start":"../scougall-chrome/index.html",
+		"node":true
+		
+	},
+	
+	{
+		
+		"name":"File Manager",
+		"icon":"../files/file.png",
+		"start":"../files/index.html",
+		"node":true
+		
+	}
+	
+]
