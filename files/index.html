@@ -56,6 +56,7 @@
 				background-color: white;
 				margin: 0px;
 				padding: 0px;
+				font-family: Arial, Helvetica, sans-serif;
 				
 			}
 			
@@ -72,7 +73,7 @@
 				
 			}
 			
-			button {
+			.section button {
 				
 				background-color: #666;
 				border-style: solid;
@@ -81,7 +82,7 @@
 				
 			}
 			
-			button:hover {
+			.section button:hover {
 				
 				background-color: #888;
 				
@@ -136,6 +137,61 @@
 				
 			}
 			
+			#location {
+				
+				height: 30px;
+				width: 100vw;
+				display: block;
+				position: absolute;
+				left: 0px;
+				top: 100px;
+				box-sizing: border-box;
+				line-height: 30px;
+				padding: 0px;
+				padding-left: 10px;
+				
+			}
+			
+			#box button,#box input[type="submit"] {
+				
+				display: block;
+				position: absolute;
+				top: 100px;
+				height: 30px;
+				width: 30px;
+				line-height: 30px;
+				text-align: center;
+				background-position: center center;
+				background-repeat: no-repeat;
+				padding: 0px;
+				margin: 0px;
+				border-style: none;
+				background-color: transparent;
+				
+			}
+			
+			#box button:hover,,#box input[type="submit"]:hover {
+				
+				background-color: #ccc;
+				
+			}
+			
+			#go {
+				
+				background-image: url('go.png');
+				background-size: 25px auto;
+				right: 5px;
+				
+			}
+			
+			#up {
+				
+				background-image: url('up.png');
+				background-size: auto 25px;
+				right: 40px;
+				
+			}
+			
 		</style>
 	</head>
 	<body>
@@ -160,11 +216,11 @@
 			
 		</div>
 		
-		<div ID="box">
+		<form ID="box">
 			
-			<input type="text" ID="location" placeholder="Location"><button type="button" ID="up"></button><button ID="go"></button>
+			<input type="text" ID="location" placeholder="Location"><button type="button" ID="up"></button><input type="submit" ID="go" value="">
 			
-		</div>
+		</form>
 		
 		<ul ID="list"></ul>
 		
