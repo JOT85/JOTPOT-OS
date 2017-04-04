@@ -30,7 +30,6 @@ let apps = JSON.parse(fs.readFileSync("./apps.json").toString()) ;
 	let creating = document.createElement("div") ;
 	creating.classList.add("app") ;
 	creating.id = "debugmode" ;
-	creating.style.backgroundImage = `url('https://d30y9cdsu7xlg0.cloudfront.net/png/384791-200.png')` ;
 	creating.addEventListener("click",_=>{
 		
 		ipc.send("debugmode") ;

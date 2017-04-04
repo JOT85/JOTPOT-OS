@@ -170,7 +170,7 @@
 				
 			}
 			
-			#box button:hover,,#box input[type="submit"]:hover {
+			#box button:hover,#box input[type="submit"]:hover {
 				
 				background-color: #ccc;
 				
@@ -232,6 +232,9 @@
 			let path = require("path") ;
 			
 			let list = document.getElementById("list") ;
+			let locationInput = document.getElementById("location") ;
+			let box = document.getElementById("box") ;
+			let upButton = document.getElementById("up") ;
 			
 			function giveMeErrors(err) {
 				
@@ -306,6 +309,7 @@
 								addSelectListeners(creating,_=>{
 									
 									currentDir = path.join(d,dirs[doing]) ;
+									locationInput.value = currentDir ;
 									renderDir(currentDir) ;
 									
 								}) ;
@@ -359,6 +363,30 @@
 				}) ;
 				
 			}
+			
+			box.addEventListener("submit",e=>{
+				
+				e.preventDefault() ;
+				currentDir = locationInput.value ;
+				renderDir(currentDir) ;
+				return false ;
+				
+			}) ;
+			
+			upButton.addEventListener("click",_=>{
+				
+				currentDir = currentDir.replace(/\\/g,"/").split("/") ;
+				currentDir.pop() ;
+				currentDir = currentDir.join("/") ;
+				if (currentDir === "") {
+					
+					currentDir = "/" ;
+					
+				}
+				locationInput.value = currentDir ;
+				renderDir(currentDir) ;
+				
+			}) ;
 			
 			renderDir(currentDir) ;
 			
