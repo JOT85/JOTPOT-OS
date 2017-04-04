@@ -24,6 +24,12 @@
 				
 			}
 			
+			.item.selected {
+				
+				background-color: #67c;
+				
+			}
+			
 			.dir {
 				
 				background-image: url('dir.png');
@@ -53,10 +59,116 @@
 				
 			}
 			
+			#nav {
+				
+				position: absolute;
+				top: 0px;
+				width: 0px;
+				width: 100vw;
+				height: 100px;
+				background-color: #aaa;
+				padding: 0px;
+				margin: 0px;
+				
+			}
+			
+			button {
+				
+				background-color: #666;
+				border-style: solid;
+				border-width: 1px;
+				border-color: #ddd;
+				
+			}
+			
+			button:hover {
+				
+				background-color: #888;
+				
+			}
+			
+			.button-single {
+				
+				margin: 0px;
+				padding: 0px;
+				box-sizing: border-box;
+				text-align: center;
+				height: 25px;
+				line-height: 23px;
+				display: block;
+				width: 100px;
+				
+			}
+			
+			.button-double {
+				
+				margin: 0px;
+				padding: 0px;
+				box-sizing: border-box;
+				text-align: center;
+				height: 50px;
+				line-height: 48px;
+				display: block;
+				width: 100px;
+				
+			}
+			
+			.section {
+				
+				display: block;
+				position: absolute;
+				top: 0px;
+				left: 0px;
+				
+			}
+			
+			ul {
+				
+				display: block;
+				position: absolute;
+				left: 0px;
+				width: 100vw;
+				top: 130px;
+				height: calc(100vh - 130px);
+				overflow: auto;
+				margin: 0px;
+				padding: 0px;
+				
+			}
+			
 		</style>
 	</head>
 	<body>
+		
+		
+		<div ID="nav">
+			
+			<div class="section">
+				<button type="button" ID="button-copy" class="button-single">Copy</button>
+				<button type="button" ID="button-copy-path" class="button-single">Copy Path</button>
+				<button type="button" ID="button-cut" class="button-single">Cut</button>
+				<button type="button" ID="button-paste" class="button-single">Paste</button>
+			</div>
+			<div class="section" style="left:100px;">
+				<button type="button" ID="button-delete" class="button-double">Delete</button>
+				<button type="button" ID="button-rename" class="button-double">Rename</button>
+			</div>
+			<div class="section" style="left:200px;">
+				<button type="button" ID="button-new-file" class="button-double">New File</button>
+				<button type="button" ID="button-new-file" class="button-double">New Directory</button>
+			</div>
+			
+		</div>
+		
+		<div ID="box">
+			
+			<input type="text" ID="location" placeholder="Location"><button type="button" ID="up"></button><button ID="go"></button>
+			
+		</div>
+		
 		<ul ID="list"></ul>
+		
+		
 		<script type="text/javascript">
 			
 			let currentDir = "/" ;
@@ -68,6 +180,29 @@
 			function giveMeErrors(err) {
 				
 				throw new Error(err) ;
+				
+			}
+			
+			let currentlySelectedFiles = new Array() ;
+			function addSelectListeners(elem,openFunc) {
+				
+				elem.addEventListener("click",_=>{
+					
+					for (let doing in currentlySelectedFiles) {
+						
+						currentlySelectedFiles[doing].classList.remove("selected") ;
+						
+					}
+					elem.classList.add("selected") ;
+					currentlySelectedFiles.push(elem) ;
+					
+				}) ;
+				
+				if (typeof openFunc === "function") {
+					
+					elem.addEventListener("dblclick",openFunc) ;
+					
+				}
 				
 			}
 			
@@ -102,6 +237,7 @@
 								creating.classList.add("item") ;
 								creating.classList.add("file-err") ;
 								creating.innerText = x[doing] ;
+								addSelectListeners(creating) ;
 								list.appendChild(creating) ;
 								
 							}
@@ -111,7 +247,7 @@
 								creating.classList.add("item") ;
 								creating.classList.add("dir") ;
 								creating.innerText = dirs[doing] ;
-								creating.addEventListener("click",_=>{
+								addSelectListeners(creating,_=>{
 									
 									currentDir = path.join(d,dirs[doing]) ;
 									renderDir(currentDir) ;
@@ -126,6 +262,7 @@
 								creating.classList.add("item") ;
 								creating.classList.add("file") ;
 								creating.innerText = files[doing] ;
+								addSelectListeners(creating) ;
 								list.appendChild(creating) ;
 								
 							}
