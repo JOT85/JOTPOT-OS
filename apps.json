@@ -3,8 +3,8 @@
 	{
 		
 		"name":"Scougall Chrome",
-		"icon":"../scougall-chrome/s.png",
-		"start":"../scougall-chrome/index.html",
+		"icon":"../scougall-chrome.asar/s.png",
+		"start":"../scougall-chrome.asar/index.html",
 		"node":true
 		
 	},
@@ -12,8 +12,8 @@
 	{
 		
 		"name":"File Manager",
-		"icon":"../files/file.png",
-		"start":"../files/index.html",
+		"icon":"../files.asar/file.png",
+		"start":"../files.asar/index.html",
 		"node":true
 		
 	}

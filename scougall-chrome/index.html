@@ -211,7 +211,7 @@ Scougall Chrome
 		let tabs = new Array() ;
 		let currentTab = -1 ;
 		
-		let inject = require("fs").readFileSync("./resources/scougall-chrome.asar/inject.js").toString() ;
+		let inject = require("fs").readFileSync(__dirname+"/inject.js").toString() ;
 		
 		let tabsElem = document.getElementById("tabs") ;
 		let newtab = document.getElementById("newtab") ;
