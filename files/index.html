@@ -247,13 +247,30 @@
 				
 				elem.addEventListener("click",_=>{
 					
-					for (let doing in currentlySelectedFiles) {
+					if (currentlySelectedFiles.indexOf(elem) !== -1) {
 						
-						currentlySelectedFiles[doing].classList.remove("selected") ;
+						elem.classList.remove("selected") ;
+						currentlySelectedFiles.splice(currentlySelectedFiles.indexOf(elem),1) ;
 						
 					}
-					elem.classList.add("selected") ;
-					currentlySelectedFiles.push(elem) ;
+					
+					else {
+						
+						if (!ctrlDown) {
+							
+							for (let doing in currentlySelectedFiles) {
+								
+								currentlySelectedFiles[doing].classList.remove("selected") ;
+								currentlySelectedFiles = [] ;
+								
+							}
+							
+						}
+						
+						elem.classList.add("selected") ;
+						currentlySelectedFiles.push(elem) ;
+						
+					}
 					
 				}) ;
 				
@@ -385,6 +402,26 @@
 				}
 				locationInput.value = currentDir ;
 				renderDir(currentDir) ;
+				
+			}) ;
+			
+			let ctrlDown = false ;
+			document.body.addEventListener("keydown",e=>{
+				
+				if (e.key === "Control") {
+					
+					ctrlDown = true ;
+					
+				}
+				
+			}) ;
+			document.body.addEventListener("keyup",e=>{
+				
+				if (e.key === "Control") {
+					
+					ctrlDown = false ;
+					
+				}
 				
 			}) ;
 			
