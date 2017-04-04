@@ -2,6 +2,7 @@ let {app} = require("electron") ;
 let bw = require("electron").BrowserWindow ;
 let wc = require("electron").webContents ;
 let ipc = require("electron").ipcMain ;
+let path = require("path") ;
 let main ;
 let w = new Object() ;
 let debugmode = false ;
@@ -56,3 +57,29 @@ ipc.on("debugmode",_=>{
 	
 }) ;
 ipc.on("closeall",_=>app.quit()) ;
+
+
+let apps = JSON.parse(fs.readFileSync("./apps.json").toString()) ;
+let defaults = JSON.parse(fs.readFileSync("./defaults.json").toString()) ;
+ipc.on("open",(m,file,doDefault)=>{
+	
+	let ext = path.extname(file) ;
+	if (doDefault && typeof defaults[ext] !== "undefined") {
+		
+		main.webContents.send("newWindow",[apps[defaults[ext]].start+"#"+file,apps[defaults[ext]].node]) ;
+		return ;
+		
+	}
+	let progs = new Array() ;
+	for (let doing in apps) {
+		
+		if (apps[doing].files.indexOf(ext) !== -1) {
+			
+			progs.push(doing) ;
+			
+		}
+		
+	}
+	console.log("Default not set, options:",progs.join(", ")) ;
+	
+}) ;
