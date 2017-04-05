@@ -1,0 +1,56 @@
+<html>
+<head>
+<title>
+Dialogue
+</title>
+</head>
+<body>
+<script type="text/javascript">
+	
+	if (window.location.search) {
+		
+		let ipc = require("electron").ipcRenderer ;
+		let id = window.location.search.substring(1,window.location.search.length) ;
+		ipc.on("do",(m,o)=>{
+			
+			if (typeof o.title !== "undefined") {
+				
+				let creating = document.createElement("div") ;
+				creating.classList.add("title") ;
+				creating.innerText = o.title ;
+				document.body.appendChild(creating) ;
+				
+			}
+			
+			if (typeof o.message !== "undefined") {
+				
+				let creating = document.createElement("div") ;
+				creating.classList.add("message") ;
+				creating.innerText = o.message ;
+				document.body.appendChild(creating) ;
+				
+			}
+			
+			for (let doing in o.options) {
+				
+				let creating = document.createElement("button") ;
+				creating.type = "button" ;
+				creating.classList.add("option") ;
+				creating.innerText = o.options[doing] ;
+				creating.addEventListener("click",_=>{
+					
+					ipc.send("Dialogue-Got",id,parseInt(doing)) ;
+					
+				}) ;
+				document.body.appendChild(creating) ;
+				
+			}
+			
+		}) ;
+		ipc.send("Dialogue-Get",id) ;
+		
+	}
+	
+</script>
+</body>
+</html>
