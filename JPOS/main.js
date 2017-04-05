@@ -2,8 +2,10 @@ let {app} = require("electron") ;
 let bw = require("electron").BrowserWindow ;
 let wc = require("electron").webContents ;
 let ipc = require("electron").ipcMain ;
+let fs = require("fs") ;
 let path = require("path") ;
-let main ;
+let dialogues = require("J:/JOTPOT OS/resources/dialogues.asar/main.js") ;
+global.main = null ;
 let w = new Object() ;
 let debugmode = false ;
 
