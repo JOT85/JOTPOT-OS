@@ -40,6 +40,7 @@ Dialogue
 				creating.addEventListener("click",_=>{
 					
 					ipc.send("Dialogue-Got",id,parseInt(doing)) ;
+					window.close() ;
 					
 				}) ;
 				document.body.appendChild(creating) ;

@@ -230,6 +230,7 @@
 			let currentDir = "/" ;
 			let fs = require("fs") ;
 			let path = require("path") ;
+			let JPOS = require("JPOS") ;
 			
 			let list = document.getElementById("list") ;
 			let locationInput = document.getElementById("location") ;
@@ -339,7 +340,11 @@
 								creating.classList.add("item") ;
 								creating.classList.add("file") ;
 								creating.innerText = files[doing] ;
-								addSelectListeners(creating) ;
+								addSelectListeners(creating,_=>{
+									
+									JPOS.open(path.join(currentDir,files[doing])) ;
+									
+								}) ;
 								list.appendChild(creating) ;
 								
 							}

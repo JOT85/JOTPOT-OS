@@ -63,7 +63,7 @@ ipc.on("closeall",_=>app.quit()) ;
 
 let apps = JSON.parse(fs.readFileSync("./apps.json").toString()) ;
 let defaults = JSON.parse(fs.readFileSync("./defaults.json").toString()) ;
-ipc.on("open",(m,file,doDefault)=>{
+ipc.on("open",(m,file,doDefault=true)=>{
 	
 	let ext = path.extname(file) ;
 	if (doDefault && typeof defaults[ext] !== "undefined") {
@@ -72,16 +72,28 @@ ipc.on("open",(m,file,doDefault)=>{
 		return ;
 		
 	}
-	let progs = new Array() ;
+	let progs = new Object() ;
 	for (let doing in apps) {
 		
 		if (apps[doing].files.indexOf(ext) !== -1) {
 			
-			progs.push(doing) ;
+			prog[apps[doing].name] = doing ;
 			
 		}
 		
 	}
-	console.log("Default not set, options:",progs.join(", ")) ;
+	dialogues.popup({
+		
+		title:"Please choose a default programme for opening " + ext + " files with.",
+		options:Object.keys(progs)
+		
+	}).then(toBeDefault=>{
+		
+		toBeDefault = progs[toBeDefault] ;
+		defaults[ext] = toBeDefault ;
+		fs.writeFile("./defaults.json",JSON.stringify(defaults)) ;
+		main.webContents.send("newWindow",[apps[defaults[ext]].start+"#"+file,apps[defaults[ext]].node]) ;
+		
+	}) ;
 	
 }) ;

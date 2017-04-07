@@ -205,6 +205,15 @@ function newWindow(url,nodeInt=false) {
 		view.nodeintegration = nodeInt ;
 		view.src = url ;
 		setTimeout(_=>ipc.send("windowContents",view.getWebContents().id),1000) ;
+		view.addEventListener("close",_=>{
+			
+			windows.removeChild(wins[currentIndex].elem) ;
+			removeTask(wins[currentIndex].task) ;
+			wins[currentIndex] = null ;
+			currentlyFocused = -1 ;
+			garbCollect() ;
+			
+		}) ;
 		
 		{
 			

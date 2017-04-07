@@ -1,5 +1,5 @@
 let ipc = require("electron").ipcMain ;
-let currentD = 0 ;
+let currentI = 0 ;
 let os = new Array() ;
 let resolvers = new Array() ;
 
@@ -15,17 +15,46 @@ ipc.on("Dialogue-Got",(m,id,result)=>{
 	
 }) ;
 
-ipc.on("popup",(m,...args)=>module.exports.popup(...args).then(console.log)) ;
-
-module.exports.popup =o=> {
+ipc.on("popup",(m,o,sync)=>{
 	
-	currentD++ ;
-	os[currentD] = o ;
-	main.webContents.send("newWindow",[`../dialogues.asar/main.html?${currentD}`,true]) ;
-	return new Promise(resolve=>{
+	if (!sync) {
 		
-		resolvers[currentD] = resolve ;
+		let ID = module.exports.popup(o,false) ;
+		m.returnValue = ID ;
+		resolvers[ID] = result => {
+			
+			m.sender.send("popup-done-"+ID,result) ;
+			
+		} ;
 		
-	}) ;
+	}
+	
+	else {
+		
+		module.exports.popup(o,true).then(val=>m.returnValue=val) ;
+		
+	}
+	
+}) ;
+
+module.exports.popup =(o,returnPromise=false)=> {
+	
+	currentI++ ;
+	let currentID = currentI ;
+	os[currentID] = o ;
+	main.webContents.send("newWindow",[`../dialogues.asar/main.html?${currentID}`,true]) ;
+	
+	if (returnPromise) {
+		
+		return new Promise(resolve=>{
+			
+			resolvers[currentID] = resolve ;
+			
+		}) ;
+		
+	}
+	
+	resolvers[currentID] =_=> {} ;
+	return currentID ;
 	
 } ;
