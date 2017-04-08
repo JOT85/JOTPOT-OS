@@ -104,7 +104,9 @@ let defaults = {
 	left: 10,
 	width: 500,
 	height: 300,
-	autoShow:true
+	autoShow:true,
+	onTop:false,
+	resize:true
 	
 } ;
 function addDefaults(ob) {
@@ -172,11 +174,19 @@ function newWindow(url,winOptions) {
 	thisWin.style.transform = "translateX(10px) translateY(10px)" ;
 	thisWin.style.height = winOptions.height ;
 	thisWin.style.width = winOptions.width ;
+	
 	if (!winOptions.resize) {
 		
 		thisWin.style.resize = "none" ;
 		
 	}
+	
+	if (winOptions.onTop) {
+		
+		thisWin.classList.add("always-on-top") ;
+		
+	}
+	
 	let title = document.createElement("div") ;
 	title.classList.add("window-title") ;
 	title.addEventListener("mousedown",e=>{
@@ -256,6 +266,15 @@ function newWindow(url,winOptions) {
 			else if (m.channel === "hide") {
 				
 				wins[currentIndex].hide() ;
+				
+			}
+			
+			else if (m.channel === "center") {
+				
+				let d = windows.getBoundingClientRect() ;
+				thisWin.left = (d.width-parseInt(thisWin.style.width))/2 ;
+				thisWin.top = (d.height-parseInt(thisWin.style.height))/2 ;
+				renderWindowPosition(currentIndex) ;
 				
 			}
 			

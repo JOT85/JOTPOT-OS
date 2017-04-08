@@ -15,7 +15,7 @@
 	
 	display: block;
 	position: absolute;
-	z-index: 503;
+	z-index: 5003;
 	border-style: none;
 	background-color: #009fff;
 	resize: both;
@@ -46,7 +46,19 @@
 .window.focused {
 	
 	background-color: #057fff;
-	z-index: 505;
+	z-index: 5005;
+	
+}
+
+.window.always-on-top {
+	
+	z-index: 5103 ;
+	
+}
+
+.window.always-on-top.focused {
+	
+	z-index: 5105 ;
 	
 }
 

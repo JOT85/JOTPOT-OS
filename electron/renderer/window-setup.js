@@ -124,7 +124,7 @@ module.exports = (ipcRenderer, guestInstanceId, openerId, hiddenPage) => {
   window.alert = function (message, title) {
 	JPOS.popupSync({
 		
-		title:title,
+		title:title||"JavaScript Alert",
 		message:message,
 		options:["OK"]
 		

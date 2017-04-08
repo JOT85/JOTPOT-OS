@@ -24,6 +24,7 @@ module.exports = {
 		
 		show:_=>ipc.sendToHost("show"),
 		hide:_=>ipc.sendToHost("hide"),
+		center:_=>ipc.sendToHost("center"),
 		setWidth:w=>ipc.sendToHost("set-width",w),
 		setHeight:h=>ipc.sendToHost("set-height",h),
 		setTop:t=>ipc.sendToHost("set-top",t),

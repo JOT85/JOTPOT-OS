@@ -72,7 +72,7 @@ function addTask(up,title,focusFunc,pointer,hidden=false) {
 	}
 	task.show =_=> {
 		
-		thisItem.style.display = "block" ;
+		thisItem.style.display = "inline-block" ;
 		
 	} ;
 	task.hide =_=> {

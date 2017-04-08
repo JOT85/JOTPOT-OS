@@ -469,7 +469,17 @@ Scougall Chrome
 			
 		}) ;
 		
-		newTab(homePage) ;
+		if (window.location.hash) {
+			
+			newTab(`file://${window.location.hash.substring(1,window.location.hash.length)}`) ;
+			
+		}
+		
+		else {
+			
+			newTab(homePage) ;
+			
+		}
 		
 	</script>
 	

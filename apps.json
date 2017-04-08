@@ -6,7 +6,7 @@
 		"icon":"../scougall-chrome.asar/s.png",
 		"start":"../scougall-chrome.asar/index.html",
 		"node":true,
-		"files":["html","htm"]
+		"files":[".html",".htm",".txt",".pdf"]
 		
 	},
 	

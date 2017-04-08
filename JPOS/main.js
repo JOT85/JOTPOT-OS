@@ -4,7 +4,13 @@ let wc = require("electron").webContents ;
 let ipc = require("electron").ipcMain ;
 let fs = require("fs") ;
 let path = require("path") ;
-let dialogues = require("J:/JOTPOT OS/resources/dialogues.asar/main.js") ;
+let cd = __dirname.split(path.sep) ;
+cd.pop() ;
+cd.pop() ;
+cd = cd.join(path.sep) ;
+process.chdir(cd) ;
+console.log(process.cwd()) ;
+let dialogues = require(path.join(process.cwd(),"/resources/dialogues.asar/main.js")) ;
 global.main = null ;
 let w = new Object() ;
 let debugmode = false ;
@@ -66,33 +72,41 @@ let defaults = JSON.parse(fs.readFileSync("./defaults.json").toString()) ;
 ipc.on("open",(m,file,doDefault=true)=>{
 	
 	let ext = path.extname(file) ;
+	console.log("Opeining",ext,"file...") ;
 	if (doDefault && typeof defaults[ext] !== "undefined") {
 		
-		main.webContents.send("newWindow",[apps[defaults[ext]].start+"#"+file,apps[defaults[ext]].node]) ;
+		console.log("Default found...") ;
+		console.log(defaults[ext]) ;
+		main.webContents.send("newWindow",[apps[defaults[ext]].start+"#"+file,{node:apps[defaults[ext]].node}]) ;
 		return ;
 		
 	}
 	let progs = new Object() ;
+	console.log(progs) ;
 	for (let doing in apps) {
 		
+		console.log(apps[doing].files) ;
+		console.log(ext) ;
 		if (apps[doing].files.indexOf(ext) !== -1) {
 			
-			prog[apps[doing].name] = doing ;
+			progs[apps[doing].name] = doing ;
 			
 		}
 		
 	}
+	console.log(progs) ;
 	dialogues.popup({
 		
-		title:"Please choose a default programme for opening " + ext + " files with.",
+		title:"Select a default programme.",
+		message:"Please choose a default programme for opening " + ext + " files with.",
 		options:Object.keys(progs)
 		
-	}).then(toBeDefault=>{
+	},true).then(toBeDefault=>{
 		
-		toBeDefault = progs[toBeDefault] ;
+		toBeDefault = progs[Object.keys(progs)[toBeDefault]] ;
 		defaults[ext] = toBeDefault ;
-		fs.writeFile("./defaults.json",JSON.stringify(defaults)) ;
-		main.webContents.send("newWindow",[apps[defaults[ext]].start+"#"+file,apps[defaults[ext]].node]) ;
+		fs.writeFile("./defaults.json",JSON.stringify(defaults),_=>console.log("Saved...")) ;
+		main.webContents.send("newWindow",[apps[defaults[ext]].start+"#"+file,{node:apps[defaults[ext]].node}]) ;
 		
 	}) ;
 	
