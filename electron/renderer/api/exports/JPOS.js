@@ -19,6 +19,16 @@ module.exports = {
 		}) ;
 		
 	},
-	popupSync:(o)=>ipc.sendSync("popup",o,true)
+	popupSync:(o)=>ipc.sendSync("popup",o,true),
+	window:{
+		
+		show:_=>ipc.sendToHost("show"),
+		hide:_=>ipc.sendToHost("hide"),
+		setWidth:w=>ipc.sendToHost("set-width",w),
+		setHeight:h=>ipc.sendToHost("set-height",h),
+		setTop:t=>ipc.sendToHost("set-top",t),
+		setLeft:l=>ipc.sendToHost("set-left",l)
+		
+	}
 	
 } ;

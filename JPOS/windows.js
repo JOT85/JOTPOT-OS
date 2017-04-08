@@ -97,7 +97,33 @@ function renderWindowPosition(window) {
 	
 }
 
-function newWindow(url,nodeInt=false) {
+let defaults = {
+	
+	node: false,
+	top: 10,
+	left: 10,
+	width: 500,
+	height: 300,
+	autoShow:true
+	
+} ;
+function addDefaults(ob) {
+	
+	for (let doing in defaults) {
+		
+		if (typeof ob[doing] === "undefined") {
+			
+			ob[doing] = defaults[doing] ;
+			
+		}
+		
+	}
+	
+}
+
+function newWindow(url,winOptions) {
+	
+	addDefaults(winOptions) ;
 	
 	let thisWin = document.createElement("div") ;
 	
@@ -141,11 +167,16 @@ function newWindow(url,nodeInt=false) {
 	thisWin.classList.add("window") ;
 	thisWin.style.top = "0px" ;
 	thisWin.style.left = "0px" ;
-	thisWin.left = 10 ;
-	thisWin.top = 10 ;
+	thisWin.left = winOptions.left ;
+	thisWin.top = winOptions.top ;
 	thisWin.style.transform = "translateX(10px) translateY(10px)" ;
-	thisWin.style.height = "300px" ;
-	thisWin.style.width = "300px" ;
+	thisWin.style.height = winOptions.height ;
+	thisWin.style.width = winOptions.width ;
+	if (!winOptions.resize) {
+		
+		thisWin.style.resize = "none" ;
+		
+	}
 	let title = document.createElement("div") ;
 	title.classList.add("window-title") ;
 	title.addEventListener("mousedown",e=>{
@@ -191,7 +222,7 @@ function newWindow(url,nodeInt=false) {
 	}) ;
 	
 	let view ;
-	if (nodeInt === null) {
+	if (winOptions.node === null) {
 		
 		view = document.createElement("div") ;
 		let shadow = view.attachShadow({mode:"closed"}) ;
@@ -202,7 +233,7 @@ function newWindow(url,nodeInt=false) {
 	else {
 		
 		view = document.createElement("webview") ;
-		view.nodeintegration = nodeInt ;
+		view.nodeintegration = winOptions.node ;
 		view.src = url ;
 		setTimeout(_=>ipc.send("windowContents",view.getWebContents().id),1000) ;
 		view.addEventListener("close",_=>{
@@ -212,6 +243,47 @@ function newWindow(url,nodeInt=false) {
 			wins[currentIndex] = null ;
 			currentlyFocused = -1 ;
 			garbCollect() ;
+			
+		}) ;
+		view.addEventListener("ipc-message",m=>{
+			
+			if (m.channel === "show") {
+				
+				wins[currentIndex].show() ;
+				
+			}
+			
+			else if (m.channel === "hide") {
+				
+				wins[currentIndex].hide() ;
+				
+			}
+			
+			else if (m.channel === "set-left") {
+				
+				thisWin.left = m.args[0] ;
+				renderWindowPosition(currentIndex) ;
+				
+			}
+			
+			else if (m.channel === "set-top") {
+				
+				thisWin.top = m.args[0] ;
+				renderWindowPosition(currentIndex) ;
+				
+			}
+			
+			else if (m.channel === "set-height") {
+				
+				thisWin.style.height = m.args[0] ;
+				
+			}
+			
+			else if (m.channel === "set-width") {
+				
+				thisWin.style.width = m.args[0] ;
+				
+			}
 			
 		}) ;
 		
@@ -323,11 +395,33 @@ function newWindow(url,nodeInt=false) {
 	} ;
 	thisWin.addEventListener("mousedown",_=>focusFunc("win")) ;
 	
-	wins[currentIndex].task = addTask(2,url,focusFunc,currentIndex) ;
+	console.log(winOptions) ;
+	console.log(winOptions.autoShow) ;
+	console.log(!winOptions.autoShow) ;
+	wins[currentIndex].task = addTask(2,url,focusFunc,currentIndex,!winOptions.autoShow) ;
 	currentlyFocused = wins[currentIndex].task.index ;
 	
 	thisWin.appendChild(title) ;
 	thisWin.appendChild(view) ;
+	
+	if (!winOptions.autoShow) {
+		
+		thisWin.classList.add("hidden") ;
+		
+	}
+	wins[currentIndex].show =_=> {
+		
+		thisWin.classList.remove("hidden") ;
+		wins[currentIndex].task.show() ;
+		
+	} ;
+	wins[currentIndex].hide =_=> {
+		
+		thisWin.classList.add("hidden") ;
+		wins[currentIndex].task.hide() ;
+		
+	} ;
+	
 	windows.appendChild(thisWin) ;
 	
 }

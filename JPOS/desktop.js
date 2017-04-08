@@ -51,7 +51,7 @@ for (let doing in apps) {
 	creating.style.backgroundImage = `url('${apps[doing].icon}')` ;
 	creating.addEventListener("click",_=>{
 		
-		ipc.send("newWindow",[apps[doing].start,apps[doing].node]) ;
+		ipc.send("newWindow",[apps[doing].start,{node:apps[doing].node}]) ;
 		
 	}) ;
 	let text = document.createElement("div") ;

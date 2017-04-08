@@ -30,13 +30,12 @@ document.getElementById("down_button").addEventListener("click",toggleAll) ;
 
 //Use garbCollect function from windows.js
 
-function addTask(up,title,focusFunc,pointer) {
+function addTask(up,title,focusFunc,pointer,hidden=false) {
 	
 	let thisItem = document.createElement("div") ;
 	thisItem.classList.add("task") ;
 	thisItem.innerText = title ;
 	thisItem.classList.add(taskTypes[up]) ;
-	taskbar.appendChild(thisItem) ;
 	thisItem.addEventListener("click",_=>focusFunc("task")) ;
 	let task = {
 		
@@ -66,6 +65,22 @@ function addTask(up,title,focusFunc,pointer) {
 		pointer:pointer
 		
 	} ;
+	if (hidden) {
+		
+		thisItem.style.display = "none" ;
+		
+	}
+	task.show =_=> {
+		
+		thisItem.style.display = "block" ;
+		
+	} ;
+	task.hide =_=> {
+		
+		thisItem.style.display = "none" ;
+		
+	} ;
+	taskbar.appendChild(thisItem) ;
 	let index = tasks.push(task) - 1 ;
 	task.index = index ;
 	return task ;

@@ -3,33 +3,113 @@
 <title>
 Dialogue
 </title>
+<style>
+	
+	html,body {
+		
+		margin: 0px;
+		padding: 0px;
+		width: 500px;
+		overflow: hidden;
+		
+	}
+	
+	.title {
+		
+		width: 100%;
+		margin: 0px;
+		box-sizing: border-box;
+		padding: 15px;
+		font-size: 1.3em;
+		
+	}
+	
+	.message {
+		
+		width: 100%;
+		margin: 0px;
+		box-sizing: border-box;
+		padding: 20px;
+		padding-top: 0px;
+		font-size: 0.9em;
+		
+	}
+	
+	.bContainer {
+		
+		width: 100%;
+		margin: 0px;
+		box-sizing: border-box;
+		padding: 25px;
+		font-size: 1.1em;
+		text-align: right;
+		
+	}
+	
+	.option {
+		
+		display: inline-block;
+		border-style: solid;
+		border-width: 2px;
+		border-color: darkblue;
+		background-color: blue;
+		color: #ccc;
+		height: 35px;
+		line-height: 31px;
+		width: auto;
+		padding-left: 15px;
+		padding-right: 15px;
+		
+	}
+	
+</style>
 </head>
 <body>
 <script type="text/javascript">
 	
 	if (window.location.search) {
 		
+		let JPOS = require("JPOS") ;
 		let ipc = require("electron").ipcRenderer ;
 		let id = window.location.search.substring(1,window.location.search.length) ;
 		ipc.on("do",(m,o)=>{
 			
+			window.onunload =e=> {
+				
+				ipc.send("Dialogue-Got",id,null) ;
+				
+			} ;
+			
 			if (typeof o.title !== "undefined") {
 				
-				let creating = document.createElement("div") ;
-				creating.classList.add("title") ;
-				creating.innerText = o.title ;
-				document.body.appendChild(creating) ;
+				document.title = o.title ;
 				
 			}
 			
+			let elems = new Array() ;
 			if (typeof o.message !== "undefined") {
 				
 				let creating = document.createElement("div") ;
-				creating.classList.add("message") ;
+				creating.classList.add("title") ;
 				creating.innerText = o.message ;
 				document.body.appendChild(creating) ;
+				elems.push(creating) ;
 				
 			}
+			
+			if (typeof o.details !== "undefined") {
+				
+				let creating = document.createElement("div") ;
+				creating.classList.add("message") ;
+				creating.innerText = o.details ;
+				document.body.appendChild(creating) ;
+				elems.push(creating) ;
+				
+			}
+			
+			let bContainer = document.createElement("div") ;
+			bContainer.classList.add("bContainer") ;
+			elems.push(bContainer) ;
 			
 			for (let doing in o.options) {
 				
@@ -43,9 +123,22 @@ Dialogue
 					window.close() ;
 					
 				}) ;
-				document.body.appendChild(creating) ;
+				bContainer.appendChild(creating) ;
 				
 			}
+			
+			document.body.appendChild(bContainer) ;
+			
+			JPOS.window.setWidth(510) ;
+			let height = 0 ;
+			for (let doing in elems) {
+				
+				height += elems[doing].getBoundingClientRect().height ;
+				
+			}
+			JPOS.window.setHeight(height+30) ;
+			
+			JPOS.window.show() ;
 			
 		}) ;
 		ipc.send("Dialogue-Get",id) ;

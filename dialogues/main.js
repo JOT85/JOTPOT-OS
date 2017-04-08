@@ -42,7 +42,7 @@ module.exports.popup =(o,returnPromise=false)=> {
 	currentI++ ;
 	let currentID = currentI ;
 	os[currentID] = o ;
-	main.webContents.send("newWindow",[`../dialogues.asar/main.html?${currentID}`,true]) ;
+	main.webContents.send("newWindow",[`../dialogues.asar/main.html?${currentID}`,{node:true,autoShow:false,resize:false}]) ;
 	
 	if (returnPromise) {
 		
