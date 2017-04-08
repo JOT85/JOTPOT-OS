@@ -9,7 +9,6 @@ cd.pop() ;
 cd.pop() ;
 cd = cd.join(path.sep) ;
 process.chdir(cd) ;
-console.log(process.cwd()) ;
 let dialogues = require(path.join(process.cwd(),"/resources/dialogues.asar/main.js")) ;
 global.main = null ;
 let w = new Object() ;
@@ -71,22 +70,22 @@ let apps = JSON.parse(fs.readFileSync("./apps.json").toString()) ;
 let defaults = JSON.parse(fs.readFileSync("./defaults.json").toString()) ;
 ipc.on("open",(m,file,doDefault=true)=>{
 	
-	let ext = path.extname(file) ;
-	console.log("Opeining",ext,"file...") ;
+	let ext = path.extname(file).toLowerCase() ;
+	//console.log("Opeining",ext,"file...") ;
 	if (doDefault && typeof defaults[ext] !== "undefined") {
 		
-		console.log("Default found...") ;
-		console.log(defaults[ext]) ;
+		//console.log("Default found...") ;
+		//console.log(defaults[ext]) ;
 		main.webContents.send("newWindow",[apps[defaults[ext]].start+"#"+file,{node:apps[defaults[ext]].node}]) ;
 		return ;
 		
 	}
 	let progs = new Object() ;
-	console.log(progs) ;
+	//console.log(progs) ;
 	for (let doing in apps) {
 		
-		console.log(apps[doing].files) ;
-		console.log(ext) ;
+		//console.log(apps[doing].files) ;
+		//console.log(ext) ;
 		if (apps[doing].files.indexOf(ext) !== -1) {
 			
 			progs[apps[doing].name] = doing ;
@@ -94,7 +93,7 @@ ipc.on("open",(m,file,doDefault=true)=>{
 		}
 		
 	}
-	console.log(progs) ;
+	//console.log(progs) ;
 	dialogues.popup({
 		
 		title:"Select a default programme.",
