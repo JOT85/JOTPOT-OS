@@ -130,7 +130,17 @@
 					
 					if (typeof spawnArgs[0] === "function") {
 						
-						logs.innerText += "  Doing other stuff..." ;
+						if (typeof spawnArgs[1] !== "undefined") {
+							
+							logs.innerText += spawnArgs[1] ;
+							
+						}
+						
+						else {
+							
+							logs.innerText += "  Doing other stuff..." ;
+							
+						}
 						logs.scrollTop = logs.scrollHeight ;
 						let rv = spawnArgs[0]() ;
 						if (typeof rv === "object" && typeof rv.then === "function") {
@@ -174,6 +184,7 @@
 				
 			}
 			let arch = process.arch ;
+			let nodeVersion = "6.10.2" ;
 			let stages = [
 				
 				["Updating package list...","apt-get",["update"]],
@@ -190,7 +201,40 @@
 					}
 					
 				}],
-				["Downloading Node.js binarys...","wget",""]
+				[`Downloading Node.js v${nodeVersion} binarys...`,"wget",["-O","node.tar.gz",`https://nodejs.org/dist/v${nodeVersion}/node-v${nodeVersion}-linux-${arch}.tar.gz`]],
+				[`Extracting and decompressing Node.js v${nodeVersion} binarys...`,"tar",["-xzf"],"node.tar.gz"],
+				["Cleaning up...","rm",["node.tar.gz"]],
+				[`Installing Node.js v${nodeVersion}...`,"cp",["-R",`node/node-v${nodeVersion}-linux-${arch}/bin/*`,"/usr/bin"]],
+				[`Installing Node.js v${nodeVersion}...`,"cp",["-R",`node/node-v${nodeVersion}-linux-${arch}/include/*`,"/usr/include"]],
+				[`Installing Node.js v${nodeVersion}...`,"cp",["-R",`node/node-v${nodeVersion}-linux-${arch}/lib/*`,"/usr/lib"]],
+				[`Installing Node.js v${nodeVersion}...`,"cp",["-R",`node/node-v${nodeVersion}-linux-${arch}/share/*`,"/usr/share"]],
+				["Cleaning up...","rm",["-R","node"]],
+				["Downloading JOTPOT Server Latest...","wget",["-O","jps.zip","https://github.com/JOTPOT-UK/JOTPOT-Server/archive/master.zip"]],
+				["Extracting and decompressing JOTPOT Server Latest...","unzip",["jps.zip"]],
+				["Cleaning up...","rm",["jps.zip"]],
+				["Installing JOTPOT Server Latest...","mkdir",["/server"]],
+				["Installing JOTPOT Server Latest...","cp",["-R","JOTPOT-Server-master/*","/server"]],
+				["Cleaning up...","rm",["-R","JOTPOT-Server-master"]],
+				["Extracting electron (again), but for JPOS DE this time :)","unzip",["electron.zip","-d","/JPOS"]],
+				["Cleaning up...","rm",["electron.zip"]],
+				["Setting up electron for JPOT DE...","mv",["/JPOS/electron","/JPOS/JPOS"]],
+				["Setting up electron for JPOT DE...","rm",["/JPOS/resources/default_app.asar"]],
+				["Setting up electron for JPOT DE...","rm",["/JPOS/resources/electron.asar"]],
+				["Downloading JPOS DE and JPOS DM...","wget",["-O","jpos-f.zip","https://www.jotpot.co.uk/experimental/JPOS/stableish.zip"]],
+				["Extracting and decompressing JPOS DE and JPOS DM...","unzip",["jpos-f.zip","-d","/JPOS/resources"]],
+				["Cleaning up...","rm",["jpos-f.zip"]],
+				["Adding init scripts...","link",["/JPOS/resources/shell/run.sh","/etc/profile.d/JPOS.sh"]],
+				["Adding init scripts...","chmod",["+x","/etc/profile.d/JPOS.sh"]],
+				["Adding init scripts...",_=>{
+					
+					let origF = fs.readFileSync("/etc/rc.local.old") ;
+					let newF = origF.split("\n") ;
+					newF.splice(1,0,"#JPOS systemcontrol server, this MUST be run for JPOS to function correctly...\nnode /JPOS/resources/shell/systemcontrol.js &") ;
+					newF = newF.join("\n") ;
+					fs.writeFileSync("/etc/rc.local",newF) ;
+					
+				},"  Modifiying /etc/rc.local"],
+				["DONE!!! Rebooting now!!!","reboot"]
 				
 			] ;
 			let fs = require("fs") ;

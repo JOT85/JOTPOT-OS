@@ -12,6 +12,7 @@ echo "JPOS is licenced under the Apache License 2.0 - view at http://www.apache.
 echo "NONE OF YOUR FILES SHOULD BE LOST during this installation, however it is still highly recomended you make backups of all files on this computer before installing."
 echo ""
 echo "!!! Please do not power off this computer while JPOS is installing, this may lead to data curruption or an incomplete installation, thus leaving your computer in an unstable state. !!!"
+echo "!!! Also, please ensure the file '/etc/profile' does not use the 'exit' command. !!!"
 echo ""
 conf=""
 echo "Start installation of JPOS now? [Y/n]"
@@ -32,6 +33,16 @@ elif [ "$a" == "x86" ]
 then
 	a="ia32"
 fi
+file(f) {
+	if [ -f "$f" ] || [ -d "$f" ]
+	then
+		echo "'$f' already exists, renaming it to $f.old"
+		file "$f.old"
+		mv "$f" "$f.old"
+	fi
+}
+file "/server"
+file "/JPOS"
 electron_version="1.6.2"
 echo "Downloading precompiled version of electron v$electron_version for linux on $a from 'https://github.com/electron/electron/releases/download/v$electron_version/$electron_file.zip'..."
 electron_file="electron-v$electron_version-linux-$a"
@@ -45,6 +56,8 @@ wget -O "./installer/resources/app.asar" "https://www.jotpot.co.uk/experimental/
 echo "Installing/Updating the X server..."
 apt-get -y install xinit >/dev/null
 echo "Changing boot target..."
+file /etc/rc.local.old
+file /etc/rc.local.toput
 mv /etc/rc.local /etc/rc.local.old
 echo "#!/bin/bash" >/etc/rc.local
 echo "exec < /dev/tty1" >>/etc/rc.local

@@ -14,7 +14,7 @@ file(f) {
 		mv "$f" "$f.old"
 	fi
 }
-file "JPOS-install"
+file "/JPOS-install"
 mkdir JPOS-install
 cd JPOS-install
 echo "Downloading basic content..."
