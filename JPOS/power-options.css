@@ -1,0 +1,37 @@
+#power-options {
+	
+	background-color: #333;
+	height: 30px;
+	line-height: 30px;
+	color: #ccc;
+	font-family: Arial, Helvetica, sans-serif;
+	padding-left: 10px;
+	padding-right: 10px;
+	
+}
+
+.power-menu-item {
+	
+	background-color: #333;
+	height: 30px;
+	line-height: 30px;
+	color: #ccc;
+	font-family: Arial, Helvetica, sans-serif;
+	padding-left: 10px;
+	padding-right: 10px;
+	
+}
+
+.power-menu-item:hover,#power-options:hover {
+	
+	background-color: #666;
+	color: #000;
+	
+}
+
+.power-menu-item:active,#power-options:active {
+	
+	background-color: #ccc;
+	color: #333;
+	
+}

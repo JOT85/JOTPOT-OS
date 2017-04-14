@@ -1,0 +1,25 @@
+#!/bin/bash
+echo "Welcome to the JOTPOT OS (JPOS) installer..."
+if [ "$(whoami)" != "root" ]
+then
+	echo "The installer should be run as root. To run as root, either be logged in as root or put 'sudo' in front of the command to start the installation."
+	exit
+fi
+cd /
+file(f) {
+	if [ -f "$f" ] || [ -d "$f" ]
+	then
+		echo "'$f' already exists, renaming it to $f.old"
+		file "$f.old"
+		mv "$f" "$f.old"
+	fi
+}
+file "JPOS-install"
+mkdir JPOS-install
+cd JPOS-install
+echo "Downloading basic content..."
+wget https://www.jotpot.co.uk/experimental/JPOS/installer.sh >/dev/null
+chmod +x installer.sh
+echo "Handing you over..."
+./installer.sh
+exit

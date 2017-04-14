@@ -24,7 +24,8 @@
 'use strict'
 
 const {defineProperty} = Object
-let JPOS = require("./api/exports/JPOS.js") ;
+//let JPOS = require("./api/exports/JPOS.js") ;
+let JPOS = require("JPOS") ;
 
 // Helper function to resolve relative url.
 const a = window.top.document.createElement('a')

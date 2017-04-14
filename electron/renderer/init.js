@@ -18,6 +18,7 @@ var globalPaths = Module.globalPaths
 
 // Expose public APIs.
 globalPaths.push(path.join(__dirname, 'api', 'exports'))
+globalPaths.push(path.join(__dirname, '..', '..', 'JPOS.asar', 'exports'))
 
 // The global variable will be used by ipc for event dispatching
 var v8Util = process.atomBinding('v8_util')

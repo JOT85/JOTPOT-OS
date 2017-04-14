@@ -1,0 +1,193 @@
+<html>
+<head>
+<title>
+JOTPOT OS Login Manager
+</title>
+<link rel="stylesheet" type="text/css" href="power-options.css">
+</head>
+<style>
+	
+	html,body {
+		
+		padding: 0px;
+		margin: 0px;
+		width: 100%;
+		height: 100%;
+		background-color: black;
+		color: #ccc;
+		text-align: center;
+		
+	}
+	
+	#main {
+		
+		text-align: center;
+		font-size: 1.5em;
+		font-family: Arial, Helvetica, sans-serif;
+		position: absolute;
+		width: 100%;
+		top: 50%;
+		left: 0px;
+		transform: translateY(-70%);
+		
+	}
+	
+	#JPOS {
+		
+		margin-top: 50px;
+		width: auto;
+		
+	}
+	
+	#welcome {
+		
+		font-weight: bold;
+		padding-top: 15px;
+		
+	}
+	
+	input {
+		
+		color: white;
+		background-color: #333;
+		border-style: solid;
+		border-width: 2px;
+		border-color: #666;
+		width: 340px;
+		border-radius: 5px;
+		box-sizing: border-box;
+		padding: 10px;
+		padding-left: 15px;
+		padding-right: 15px;
+		margin: 10px;
+		
+	}
+	
+	button {
+		
+		width: 320px;
+		margin: 10px;
+		border-radius: 20px;
+		color: white;
+		background-color: #333;
+		border-style: solid;
+		border-width: 2px;
+		border-color: #666;
+		text-align: center;
+		padding: 10px;
+		
+	}
+	
+	button.half {
+		
+		width: 150px;
+		
+	}
+	
+	#more {
+		
+		position: absolute;
+		left: 0px;
+		top: 0px;
+		width: /*350px*/100%;
+		height: 100%;
+		padding: 20px;
+		box-sizing: border-box;
+		/*transform: translate(-50%,-50%);*/
+		background-color: rgba(0,0,0,0.6);
+		display: none;
+		text-align: center;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		
+	}
+	
+	#power-options {
+		
+		position: absolute;
+		bottom: 10px;
+		right: 10px;
+		
+	}
+
+	.power-menu {
+		
+		position: absolute;
+		bottom: 40px;
+		right: 10px;
+		
+	}
+	
+</style>
+<body>
+	
+	<img src="JPOS.png" ID="JPOS">
+	<div ID="main">
+		
+		<div ID="welcome">Welcome to JOTPOT OS,<br>Please log in:</div>
+		<div ID="login"><input type="text" ID="username" placeholder="Username"><br><input type="password" ID="password" placeholder="Password">
+		
+			<div ID="buttons"><button type="button" class="go half" data-go="cmdline">Command Line</button><button type="button" class="go half" data-go="/JPOS/JPOS">JPOS Desktop</button><br><button type="button" class="go" data-go="other">Other</button></div>
+		
+		</div>
+		
+	</div>
+	<div ID="more"><button type="button" class="go" data-go="cmdline">Command Line</button><button type="button" class="go" data-go="/JPOS/JPOS">JPDE</button><button type="button" class="go" data-go="/usr/bin/gnome-session">Gnome</button><button type="button" class="go" data-go="/usr/bin/mate-session">MATE</button><button type="button" class="go" data-go="/usr/bin/startlxde">LXDE</button><button type="button" class="go" data-go="/usr/bin/startkde">KDE</button><button type="button" class="go" data-go="nomore">Back...</button></div>
+	
+	<div ID="power-options">Power Options</div>
+	
+	<script type="text/javascript">
+		
+		document.getElementById("JPOS").style.height = document.getElementById("main").getBoundingClientRect().top * 0.7 ;
+		document.querySelectorAll(".go").forEach(elem=>{
+			
+			elem.addEventListener("click",_=>{
+				
+				let launch = elem.getAttribute("data-go") ;
+				if (launch === "cmdline") {
+					
+					launch = null ;
+					
+				}
+				else if (launch === "other") {
+					
+					document.getElementById("more").style.display = "flex" ;
+					return;//?
+					
+				}
+				else if (launch === "nomore") {
+					
+					document.getElementById("more").style.display = "none" ;
+					return;//?
+					
+				}
+				let usr = "jp" ;
+				require("electron").ipcRenderer.send("go",launch,usr) ;
+				
+			}) ;
+			
+		}) ;
+		
+		let powerMenu = require(__dirname+"/systemcontrol.js").createMenu().menu ;
+		powerMenu.style.display = "none" ;
+		document.body.appendChild(powerMenu) ;
+		document.getElementById("power-options").addEventListener("click",_=>{
+			
+			powerMenu.style.display = "block" ;
+			
+		}) ;
+		document.body.addEventListener("mouseup",_=>{
+			
+			powerMenu.style.display = "none" ;
+			
+		}) ;
+		
+	</script>
+	<!--Welcome to JOTPOT OS.
+	<button type="button" onclick="require('electron').ipcRenderer.send('go',null)">Command Line</button>
+	<button type="button" onclick="require('electron').ipcRenderer.send('go','/JPOS/JPOS')">JOTPOT OS Desktop</button>
+	<button type="button" onclick="require('electron').ipcRenderer.send('go','/usr/bin/gnome-session')">Gnome Desktop</button>-->
+	
+</body>
+</html>

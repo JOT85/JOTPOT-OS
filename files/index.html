@@ -314,6 +314,8 @@
 								creating.classList.add("item") ;
 								creating.classList.add("file-err") ;
 								creating.innerText = x[doing] ;
+								creating.jpos_path = path.join(d,x[doing]) ;
+								creating.jpos_type = "err" ;
 								addSelectListeners(creating) ;
 								list.appendChild(creating) ;
 								
@@ -324,6 +326,8 @@
 								creating.classList.add("item") ;
 								creating.classList.add("dir") ;
 								creating.innerText = dirs[doing] ;
+								creating.jpos_path = path.join(d,dirs[doing]) ;
+								creating.jpos_type = "dir" ;
 								addSelectListeners(creating,_=>{
 									
 									currentDir = path.join(d,dirs[doing]) ;
@@ -340,6 +344,8 @@
 								creating.classList.add("item") ;
 								creating.classList.add("file") ;
 								creating.innerText = files[doing] ;
+								creating.jpos_path = path.join(d,files[doing]) ;
+								creating.jpos_type = "file" ;
 								addSelectListeners(creating,_=>{
 									
 									JPOS.open(path.join(currentDir,files[doing])) ;
@@ -425,6 +431,99 @@
 				if (e.key === "Control") {
 					
 					ctrlDown = false ;
+					
+				}
+				
+			}) ;
+			
+			let clip = require("electron").clipboard ;
+			document.getElementById("button-copy").addEventListener("click",_=>{
+				
+				let toAdd = new String() ;
+				cutFiles = [] ;
+				for (let doing in currentlySelectedFiles) {
+					
+					if (parseInt(doing) > 0) {
+						
+						toAdd += "\n" ;
+						
+					}
+					toAdd += "file://" ;
+					toAdd += currentlySelectedFiles[doing].jpos_path ;
+					
+				}
+				clip.writeText(toAdd) ;
+				
+			}) ;
+			document.getElementById("button-copy-path").addEventListener("click",_=>{
+				
+				let toAdd = new String() ;
+				for (let doing in currentlySelectedFiles) {
+					
+					if (parseInt(doing) > 0) {
+						
+						toAdd += "\n" ;
+						
+					}
+					toAdd += currentlySelectedFiles[doing].jpos_path ;
+					
+				}
+				clip.writeText(toAdd) ;
+				
+			}) ;
+			let cutFiles = new Array() ;
+			let cutFilesClip = new String() ;
+			document.getElementById("button-cut").addEventListener("click",_=>{
+				
+				let toAdd = new String() ;
+				cutFiles = [] ;
+				for (let doing in currentlySelectedFiles) {
+					
+					if (parseInt(doing) > 0) {
+						
+						toAdd += "\n" ;
+						
+					}
+					toAdd += "file://" ;
+					toAdd += currentlySelectedFiles[doing].jpos_path ;
+					cutFiles.push(currentlySelectedFiles[doing].jpos_path) ;
+					
+				}
+				cutFilesClip = toAdd ;
+				clip.writeText(toAdd) ;
+				
+			}) ;
+			let url = require("url") ;
+			document.getElementById("button-paste").addEventListener("click",_=>{
+				
+				let todo = clip.readText() ;
+				let doCut = Boolean(todo===cutFilesClip) ;
+				todo = todo.split("\n") ;
+				for (let doing in todo) {
+					
+					let purl = url.parse(todo[doing]) ;
+					if (purl.protocol !== "file:") {
+						
+						alert("No files on the clipboard...","Error Pasting!") ;
+						return ;
+						
+					}
+					todo[doing] = purl.path ;
+					
+				}
+				for (let doing in todo) {
+					
+					console.log(`Copy ${todo[doing]} to ${path.join(currentDir,path.basename(todo[doing]))}`) ;
+					
+				}
+				if (doCut) {for (let doing in cutFiles) {
+					
+					console.log(`Now deleting ${cutFiles[doing]}`) ;
+					
+				}}
+				else {
+					
+					cutFiles = [] ;
 					
 				}
 				
