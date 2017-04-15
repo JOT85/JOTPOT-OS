@@ -55,10 +55,23 @@ rm ./installer/resources/default_app.asar
 echo ""
 echo "Downloading JPOS installer scripts from 'https://www.jotpot.co.uk/experimental/JPOS/installer.asar'..."
 wget -O "./installer/resources/app.asar" "https://www.jotpot.co.uk/experimental/JPOS/installer.asar" >/dev/null 2>/dev/null
+echo ""
 echo "Installing/Updating the X server..."
 echo "    This will either be really quick or take a VERY long time depending on the state of your system..."
 echo "    This process is very unlikely to hang, please give it time..."
-apt-get -y install xorg openbox xinit libxss1 >/dev/null 2>/dev/null
+echo "Package 1/3 - 'xorg'"
+apt-get -y install xorg >/dev/null 2>/dev/null
+echo "Package 2/3 - 'openbox'"
+apt-get -y install openbox >/dev/null 2>/dev/null
+echo "Package 3/3 - 'xinit'"
+apt-get -y install xinit >/dev/null 2>/dev/null
+echo "Installing/Updating required libraries."
+echo "Library 1/3 - 'libxss1'"
+apt-get -y install libxss1 >/dev/null 2>/dev/null
+echo "Library 2/3 - 'libnss3'"
+apt-get -y install libnss3 >/dev/null 2>/dev/null
+echo "Library 3/3 - 'libgconfmm-2.6-1c2'"
+apt-get -y install libgconfmm-2.6-1c2 >/dev/null 2>/dev/null
 echo ""
 echo "Changing boot target..."
 file /etc/rc.local

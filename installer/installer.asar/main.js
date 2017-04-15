@@ -9,7 +9,7 @@ function start() {
 	win.setSize(screen.width,screen.height) ;
 	win.setPosition(0,0) ;
 	win.loadURL(`file://${__dirname}/index.html`) ;
-	win.webContents.openDevTools() ;
+	//win.webContents.openDevTools() ;
 	
 }
 

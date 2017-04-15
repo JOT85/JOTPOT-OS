@@ -4,7 +4,7 @@ if (process.argv.indexOf("login") !== -1) {
 	let bw = require("electron").BrowserWindow ;
 	let ipc = require("electron").ipcMain ;
 	let cp = require("child_process") ;
-	let debugmode = true ;
+	let debugmode = false ;
 	let win, screen ;
 	
 	function setOnServer(s,vara,val) {
@@ -98,7 +98,7 @@ else {
 	let dialogues = require(path.join(process.cwd(),"/resources/dialogues.asar/main.js")) ;
 	global.main = null ;
 	let w = new Object() ;
-	let debugmode = true ;
+	let debugmode = false ;
 
 	app.on("ready",_=>{
 		
