@@ -69,7 +69,7 @@ echo "Installing/Updating required libraries."
 echo "Library 1/3"
 apt-get -y install libxss1 >/dev/null 2>/dev/null
 echo "Library 2/3"
-apt-get -y install libxss3 >/dev/null 2>/dev/null
+apt-get -y install libnss3 >/dev/null 2>/dev/null
 echo "Library 3/3"
 apt-get -y install libgconfmm-2.6-1c2 >/dev/null 2>/dev/null
 echo ""
