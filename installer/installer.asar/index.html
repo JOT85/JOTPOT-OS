@@ -96,8 +96,8 @@
 		<button type="button" ID="open-dev-tools">Open Dev Tools.</button>
 		<script type="text/javascript">
 			
-			let slowMode = false ;
-			let slowSpeed = 0 ;
+			let slowMode = true ;
+			let slowSpeed = 5000 ;
 			let main = document.getElementById("main") ;
 			let logs = document.getElementById("logs") ;
 			function updateMain(text) {
@@ -239,19 +239,20 @@
 					console.log(arch) ;
 					
 				},"  Gathering some infomation about your system...\n"],
-				[`Downloading Node.js v${nodeVersion} binarys...`,"wget",["-O","node.tar.gz",`https://nodejs.org/dist/v${nodeVersion}/node-v${nodeVersion}-linux-$$$arch$$$.tar`]],
-				[`Extracting and decompressing Node.js v${nodeVersion} binarys...`,"tar",["-xf","node.tar.gz"]],
+				[`Downloading Node.js v${nodeVersion} binarys...`,"wget",["-O","node.tar",`https://nodejs.org/dist/v${nodeVersion}/node-v${nodeVersion}-linux-$$$arch$$$.tar`]],
+				[`Extracting and decompressing Node.js v${nodeVersion} binarys...`,"tar",["-xf","node.tar"]],
 				["Cleaning up...","rm",["node.tar"]],
 				[`Installing Node.js v${nodeVersion}...`,"cp",["-f","-v","-R",`/JPOS-install/node-v${nodeVersion}-linux-$$$arch$$$/include/*`,"/usr/include/"]],
 				[`Installing Node.js v${nodeVersion}...`,"cp",["-f","-v","-R",`/JPOS-install/node-v${nodeVersion}-linux-$$$arch$$$/lib/*`,"/usr/lib/"]],
 				[`Installing Node.js v${nodeVersion}...`,"cp",["-f","-v","-R",`/JPOS-install/node-v${nodeVersion}-linux-$$$arch$$$/share/*`,"/usr/share/"]],
 				[`Installing Node.js v${nodeVersion}...`,"cp",["-f","-v","-R",`/JPOS-install/node-v${nodeVersion}-linux-$$$arch$$$/bin/*`,"/usr/bin/"]],
+				["Sleeping...","sleep",["30"]],
 				["Cleaning up...","rm",["-R",`node-v${nodeVersion}-linux-$$$arch$$$`]],
 				["Downloading JOTPOT Server Latest...","wget",["-O","jps.zip","https://github.com/JOTPOT-UK/JOTPOT-Server/archive/master.zip"]],
 				["Extracting and decompressing JOTPOT Server Latest...","unzip",["-o","jps.zip"]],
 				["Cleaning up...","rm",["jps.zip"]],
 				["Installing JOTPOT Server Latest...","mkdir",["/server"]],
-				["Installing JOTPOT Server Latest...","cp",["-f","-v","-R","JOTPOT-Server-master/*","/server"]],
+				["Installing JOTPOT Server Latest...","cp",["-f","-v","-R","/JPOS-install/JOTPOT-Server-master/*","/server/"]],
 				["Cleaning up...","rm",["-R","JOTPOT-Server-master"]],
 				["Extracting electron (again), but for JPOS DE this time :)","unzip",["-o","electron.zip","-d","/JPOS"]],
 				["Cleaning up...","rm",["electron.zip"]],
@@ -262,12 +263,14 @@
 				["Extracting and decompressing JPOS DE and JPOS DM...","unzip",["-o","jpos-f.zip","-d","/JPOS/resources"]],
 				["Cleaning up...","rm",["jpos-f.zip"]],
 				["Setting up the 'desktop' command...","wget",["-O","/JPOS/desktop","https://www.jotpot.co.uk/experimental/JPOS/desktop.sh"]],
-				["Setting up the 'desktop' command...","chmod",["+x","/JPOS/desktop"]],
-				["Modifying modes...","chmod",["+x","/JPOS/resources/shell/run.sh"]],
-				["Modifying modes...","chmod",["+x","/JPOS/resources/shell/login.sh"]],
 				["Downloading default settings...","wget",["-O","/JPOS/apps.json","https://www.jotpot.co.uk/experimental/JPOS/apps.json"]],
 				["Downloading default settings...","wget",["-O","/JPOS/settings.json","https://www.jotpot.co.uk/experimental/JPOS/settings.json"]],
 				["Downloading default settings...","wget",["-O","/JPOS/defaults.json","https://www.jotpot.co.uk/experimental/JPOS/defaults.json"]],
+				["Modifying modes...","chmod",["-R","0664","/JPOS/*"]],
+				["Modifying modes...","chmod",["6770","/JPOS/resources/shell/login.sh"]],
+				["Modifying modes...","chmod",["6775","/JPOS/resources/shell/run.sh"]],
+				["Modifying modes...","chmod",["0775","/JPOS/desktop"]],
+				["Modifying modes...","chmod",["1775","/JPOS/JPOS"]],
 				["Adding init scripts...","rm",["/etc/profile.d/JPOS.sh"]],
 				["Adding init scripts...","link",["/JPOS/resources/shell/run.sh","/etc/profile.d/JPOS.sh"]],
 				["Adding init scripts...","chmod",["+x","/etc/profile.d/JPOS.sh"]],
