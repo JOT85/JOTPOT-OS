@@ -233,7 +233,7 @@
 			let nodeVersion = "6.10.2" ;
 			let os_props = {
 				
-				"PRETTY_NAME":"JOTPOT OS 23",
+				"PRETTY_NAME":"JOTPOT OS 25",
 				"NAME":"JOTPOT OS",
 				"VERSION":"25",
 				"HOME_URL":"https://www.jotpot.co.uk/",
@@ -350,9 +350,16 @@
 				["Downloading default settings...","wget",["-O","/JPOS/apps.json","https://www.jotpot.co.uk/experimental/JPOS/apps.json"]],
 				["Downloading default settings...","wget",["-O","/JPOS/settings.json","https://www.jotpot.co.uk/experimental/JPOS/settings.json"]],
 				["Downloading default settings...","wget",["-O","/JPOS/defaults.json","https://www.jotpot.co.uk/experimental/JPOS/defaults.json"]],
-				["Modifying modes...","chmod",["-R","0664","/JPOS/*"]],
+				["Modifying modes...","chmod",["-R","0664","/JPOS"]],
+				["Modifying modes...","chmod",["0775","/JPOS"]],
+				["Modifying modes...","chmod",["0775","/JPOS/resources"]],
+				["Modifying modes...","chmod",["0775","/JPOS/resources/shell"]],
+				["Modifying modes...","chmod",["0775","/JPOS/locales"]],
 				["Modifying modes...","chmod",["6770","/JPOS/resources/shell/login.sh"]],
 				["Modifying modes...","chmod",["6775","/JPOS/resources/shell/run.sh"]],
+				["Modifying modes...","chmod",["0666","/JPOS/apps.json"]],
+				["Modifying modes...","chmod",["0666","/JPOS/settings.json"]],
+				["Modifying modes...","chmod",["0666","/JPOS/defaults.json"]],
 				["Modifying modes...","chmod",["0775","/JPOS/desktop"]],
 				["Modifying modes...","chmod",["1775","/JPOS/JPOS"]],
 				["Adding init scripts...","rm",["/etc/profile.d/JPOS.sh"]],
