@@ -59,18 +59,18 @@ echo ""
 echo "Installing/Updating the X server..."
 echo "    This will either be really quick or take a VERY long time depending on the state of your system..."
 echo "    This process is very unlikely to hang, please give it time..."
-echo "Package 1/3"
+echo "Package 1/3 - 'xorg'"
 apt-get -y install xorg >/dev/null 2>/dev/null
-echo "Package 2/3"
+echo "Package 2/3 - 'openbox'"
 apt-get -y install openbox >/dev/null 2>/dev/null
-echo "Package 3/3"
+echo "Package 3/3 - 'xinit'"
 apt-get -y install xinit >/dev/null 2>/dev/null
 echo "Installing/Updating required libraries."
-echo "Library 1/3"
+echo "Library 1/3 - 'libxss1'"
 apt-get -y install libxss1 >/dev/null 2>/dev/null
-echo "Library 2/3"
+echo "Library 2/3 - 'libnss3'"
 apt-get -y install libnss3 >/dev/null 2>/dev/null
-echo "Library 3/3"
+echo "Library 3/3 - 'libgconfmm-2.6-1c2'"
 apt-get -y install libgconfmm-2.6-1c2 >/dev/null 2>/dev/null
 echo ""
 echo "Changing boot target..."
