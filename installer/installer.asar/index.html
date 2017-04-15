@@ -219,6 +219,17 @@
 			}
 			let arch = process.arch ;
 			let nodeVersion = "6.10.2" ;
+			let os_props = {
+				
+				"PRETTY_NAME":"JOTPOT OS 23",
+				"NAME":"JOTPOT OS",
+				"VERSION":"25",
+				"HOME_URL":"https://www.jotpot.co.uk/",
+				"SUPPORT_URL":"https://www.jotpot.co.uk/",
+				"BUG_REPORT_URL":"https://www.jotpot.co.uk/",
+				
+			} ;
+			let os_issue = JSON.parse("\"JOTPOT OS 25 \\\\n \\\\l\\n\\n\"") ;
 			let stages = [
 				
 				["Updating package list...","apt-get",["-y","update"]],
@@ -246,7 +257,6 @@
 				[`Installing Node.js v${nodeVersion}...`,"cp",["-afvT",`/JPOS-install/node-v${nodeVersion}-linux-$$$arch$$$/lib/`,"/usr/lib"]],
 				[`Installing Node.js v${nodeVersion}...`,"cp",["-afvT",`/JPOS-install/node-v${nodeVersion}-linux-$$$arch$$$/share/`,"/usr/share"]],
 				[`Installing Node.js v${nodeVersion}...`,"cp",["-afvT",`/JPOS-install/node-v${nodeVersion}-linux-$$$arch$$$/bin/`,"/usr/bin"]],
-				["Sleeping...","sleep",["30"]],
 				["Cleaning up...","rm",["-R",`node-v${nodeVersion}-linux-$$$arch$$$`]],
 				["Downloading JOTPOT Server Latest...","wget",["-O","jps.zip","https://github.com/JOTPOT-UK/JOTPOT-Server/archive/master.zip"]],
 				["Extracting and decompressing JOTPOT Server Latest...","unzip",["-o","jps.zip"]],
@@ -262,6 +272,68 @@
 				["Downloading JPOS DE and JPOS DM...","wget",["-O","jpos-f.zip","https://www.jotpot.co.uk/experimental/JPOS/stableish.zip"]],
 				["Extracting and decompressing JPOS DE and JPOS DM...","unzip",["-o","jpos-f.zip","-d","/JPOS/resources"]],
 				["Cleaning up...","rm",["jpos-f.zip"]],
+				["This system is now JOTPOT OS!!!",_=>{
+					
+					try {
+						
+						let osRel = fs.readFileSync("/etc/os-release").toString().split("\n") ;
+						for (let doing in osRel) {
+							
+							for (let prop in os_props) {
+								
+								if (osRel[doing].toUpperCase().indexOf(`${prop}=`) === 0) {
+									
+									osRel[doing] = `${prop}="${os_props[prop]}"` ;
+									break ;
+									
+								}
+								
+							}
+							
+						}
+						osRel = osRel.join("\n") ;
+						fs.writeFileSync("/etc/os-release",osRel) ;
+						
+					}
+					
+					catch (err) {
+						
+						console.warn(err) ;
+						logsDump += "!!!FATAL ERROR WHILE READING '/etc/os-release'. It is recomended that to restart the installer...\n" ;
+						renderLogs() ;
+						
+					}
+					
+					try {
+						
+						fs.writeFileSync("/etc/issue",os_issue) ;
+						
+					}
+					
+					catch (err) {
+						
+						console.warn(err) ;
+						logsDump += "!!!FATAL ERROR WHILE WRITING '/etc/issue'. It is recomended that to restart the installer...\n" ;
+						renderLogs() ;
+						
+					}
+					
+					try {
+						
+						fs.writeFileSync("/etc/motd","\n") ;
+						
+					}
+					
+					catch (err) {
+						
+						console.warn(err) ;
+						logsDump += "!!!FATAL ERROR WHILE WRITING '/etc/motd'. It is recomended that to restart the installer...\n" ;
+						renderLogs() ;
+						
+					}
+					
+					
+				},"\n  Modifying versions...\n"]
 				["Setting up the 'desktop' command...","wget",["-O","/JPOS/desktop","https://www.jotpot.co.uk/experimental/JPOS/desktop.sh"]],
 				["Downloading default settings...","wget",["-O","/JPOS/apps.json","https://www.jotpot.co.uk/experimental/JPOS/apps.json"]],
 				["Downloading default settings...","wget",["-O","/JPOS/settings.json","https://www.jotpot.co.uk/experimental/JPOS/settings.json"]],
