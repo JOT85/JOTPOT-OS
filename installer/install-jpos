@@ -6,20 +6,23 @@ then
 	exit
 fi
 cd /
-file(f) {
-	if [ -f "$f" ] || [ -d "$f" ]
+function file {
+	if [ -f "$1" ] || [ -d "$1" ]
 	then
-		echo "'$f' already exists, renaming it to $f.old"
-		file "$f.old"
-		mv "$f" "$f.old"
+		echo "'$1' already exists, renaming it to $1.old"
+		sleep 2
+		file "$1.old"
+		mv "$1" "$1.old"
 	fi
 }
 file "/JPOS-install"
 mkdir JPOS-install
 cd JPOS-install
 echo "Downloading basic content..."
-wget https://www.jotpot.co.uk/experimental/JPOS/installer.sh >/dev/null
+wget https://www.jotpot.co.uk/experimental/JPOS/installer.sh >/dev/null 2>/dev/null
 chmod +x installer.sh
+sleep 3
 echo "Handing you over..."
+sleep 2
 ./installer.sh
 exit

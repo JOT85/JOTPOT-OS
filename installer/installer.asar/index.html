@@ -10,7 +10,7 @@
 			#title {
 				
 				position: absolute;
-				top: 10%;
+				top: 5%;
 				left: 0px;
 				height: 75px;
 				width: 100%;
@@ -30,11 +30,11 @@
 			
 			#main {
 				
-				font-size: 2em;
+				font-size: 1.4em;
 				padding: 10px;
 				padding-left: 10%;
 				position: absolute;
-				top: calc(10% + 75px);
+				top: calc(5% + 75px);
 				left: 0px;
 				box-sizing: border-box;
 				width: 100%;
@@ -49,7 +49,7 @@
 				box-sizing: border-box;
 				padding-left: 15%;
 				padding-right: 15%;
-				bottom: 0px;
+				bottom: 5%;
 				left: 0px;
 				overflow: auto;
 				
@@ -70,9 +70,21 @@
 			#force-restart {
 				
 				position: absolute;
-				right: 10px;
-				bottom: 10px;
+				right: 0px;
+				top: 0px;
+				height: 15px;
+				line-height: 15px;
+				
+			}
+			
+			#open-dev-tools {
+				
+				position: absolute;
+				right: 0px;
+				top: 15px;
 				font-size: 0.6em;
+				height: 15px;
+				line-height: 15px;
 				
 			}
 			
@@ -81,8 +93,11 @@
 		<div id="main">Just loading the installer...<br>Hang on a second...</div>
 		<div id="logs"></div>
 		<button type="button" ID="force-restart">Force Installer Restart (ONLY USE IN EMERGENCIES)</button>
+		<button type="button" ID="open-dev-tools">Open Dev Tools.</button>
 		<script type="text/javascript">
 			
+			let slowMode = false ;
+			let slowSpeed = 0 ;
 			let main = document.getElementById("main") ;
 			let logs = document.getElementById("logs") ;
 			function updateMain(text) {
@@ -91,7 +106,7 @@
 				requestAnimationFrame(_=>{
 					
 					let md = main.getBoundingClientRect() ;
-					logs.style.height = window.innerHeight - md.top - md.height ;
+					logs.style.height = window.innerHeight - (md.top * 2) - md.height ;
 					
 				}) ;
 				
@@ -102,8 +117,22 @@
 				require("electron").ipcRenderer.send("force-restart") ;
 				
 			}) ;
+			document.getElementById("open-dev-tools").addEventListener("click",_=>{
+				
+				require("electron").ipcRenderer.send("open-dev-tools") ;
+				
+			}) ;
 			let cp = require("child_process") ;
 			let cDone = false ;
+			let logsDump = "" ;
+			
+			function renderLogs() {
+				
+				logs.innerText = logsDump.substring(logsDump.length-1250,logsDump.length) ;
+				logs.scrollTop = logs.scrollHeight ;
+				
+			}
+			
 			function doCommand(label,...spawnArgs) {
 				
 				if (label === "STOP") {
@@ -132,13 +161,13 @@
 						
 						if (typeof spawnArgs[1] !== "undefined") {
 							
-							logs.innerText += spawnArgs[1] ;
+							logsDump += spawnArgs[1] ;
 							
 						}
 						
 						else {
 							
-							logs.innerText += "  Doing other stuff..." ;
+							logsDump += "  Doing other stuff..." ;
 							
 						}
 						logs.scrollTop = logs.scrollHeight ;
@@ -156,26 +185,31 @@
 						return ;
 						
 					}
-					logs.innerText += "\n# " + spawnArgs[0] ;
+					logsDump += "\n# " + spawnArgs[0] ;
 					if (typeof spawnArgs[1] === "object") {
 						
-						logs.innerText += " " + spawnArgs[1].join(" ") ;
+						for (let doing in spawnArgs[1]) {
+							
+							spawnArgs[1][doing] = spawnArgs[1][doing].replace(/\$\$\$arch\$\$\$/g,arch) ;
+							
+						}
+						logsDump += " " + spawnArgs[1].join(" ") ;
 						
 					}
-					logs.innerText += "\n" ;
-					logs.scrollTop = logs.scrollHeight ;
+					logsDump += "\n" ;
+					renderLogs() ;
 					
 					let p = cp.spawn(...spawnArgs) ;
 					p.stdout.on("data",d=>{
 						
-						logs.innerText += d.toString() ;
-						logs.scrollTop = logs.scrollHeight ;
+						logsDump += d.toString() ;
+						renderLogs() ;
 						
 					}) ;
 					p.stderr.on("data",d=>{
 						
-						logs.innerText += d.toString() ;
-						logs.scrollTop = logs.scrollHeight ;
+						logsDump += d.toString() ;
+						renderLogs() ;
 						
 					}) ;
 					p.on("exit",resolve) ;
@@ -187,53 +221,95 @@
 			let nodeVersion = "6.10.2" ;
 			let stages = [
 				
-				["Updating package list...","apt-get",["update"]],
-				["Upgrading packages...","apt-get",["upgrade"]],
-				["Upgrading dist...","apt-get",["dist-upgrade"]],
+				["Updating package list...","apt-get",["-y","update"]],
+				["Upgrading packages...","apt-get",["-y","upgrade"]],
+				["Upgrading dist...","apt-get",["-y","dist-upgrade"]],
 				["Rebooting...","reboot"],
 				["STOP"],
 				["Getting system infomation...",_=>{
 					
+					console.log(arch) ;
 					if (arch === "arm") {
 						
-						arch = cp.execSync("arch").toString() ;
+						console.log(cp.execSync("arch").toString()) ;
+						arch = cp.execSync("arch").toString().replace(/\n/g,"") ;
+						console.log(arch) ;
 						
 					}
+					console.log(arch) ;
 					
-				}],
-				[`Downloading Node.js v${nodeVersion} binarys...`,"wget",["-O","node.tar.gz",`https://nodejs.org/dist/v${nodeVersion}/node-v${nodeVersion}-linux-${arch}.tar.gz`]],
-				[`Extracting and decompressing Node.js v${nodeVersion} binarys...`,"tar",["-xzf"],"node.tar.gz"],
-				["Cleaning up...","rm",["node.tar.gz"]],
-				[`Installing Node.js v${nodeVersion}...`,"cp",["-R",`node/node-v${nodeVersion}-linux-${arch}/bin/*`,"/usr/bin"]],
-				[`Installing Node.js v${nodeVersion}...`,"cp",["-R",`node/node-v${nodeVersion}-linux-${arch}/include/*`,"/usr/include"]],
-				[`Installing Node.js v${nodeVersion}...`,"cp",["-R",`node/node-v${nodeVersion}-linux-${arch}/lib/*`,"/usr/lib"]],
-				[`Installing Node.js v${nodeVersion}...`,"cp",["-R",`node/node-v${nodeVersion}-linux-${arch}/share/*`,"/usr/share"]],
-				["Cleaning up...","rm",["-R","node"]],
+				},"  Gathering some infomation about your system...\n"],
+				[`Downloading Node.js v${nodeVersion} binarys...`,"wget",["-O","node.tar.gz",`https://nodejs.org/dist/v${nodeVersion}/node-v${nodeVersion}-linux-$$$arch$$$.tar`]],
+				[`Extracting and decompressing Node.js v${nodeVersion} binarys...`,"tar",["-xf","node.tar.gz"]],
+				["Cleaning up...","rm",["node.tar"]],
+				[`Installing Node.js v${nodeVersion}...`,"cp",["-f","-v","-R",`/JPOS-install/node-v${nodeVersion}-linux-$$$arch$$$/include/*`,"/usr/include/"]],
+				[`Installing Node.js v${nodeVersion}...`,"cp",["-f","-v","-R",`/JPOS-install/node-v${nodeVersion}-linux-$$$arch$$$/lib/*`,"/usr/lib/"]],
+				[`Installing Node.js v${nodeVersion}...`,"cp",["-f","-v","-R",`/JPOS-install/node-v${nodeVersion}-linux-$$$arch$$$/share/*`,"/usr/share/"]],
+				[`Installing Node.js v${nodeVersion}...`,"cp",["-f","-v","-R",`/JPOS-install/node-v${nodeVersion}-linux-$$$arch$$$/bin/*`,"/usr/bin/"]],
+				["Cleaning up...","rm",["-R",`node-v${nodeVersion}-linux-$$$arch$$$`]],
 				["Downloading JOTPOT Server Latest...","wget",["-O","jps.zip","https://github.com/JOTPOT-UK/JOTPOT-Server/archive/master.zip"]],
-				["Extracting and decompressing JOTPOT Server Latest...","unzip",["jps.zip"]],
+				["Extracting and decompressing JOTPOT Server Latest...","unzip",["-o","jps.zip"]],
 				["Cleaning up...","rm",["jps.zip"]],
 				["Installing JOTPOT Server Latest...","mkdir",["/server"]],
-				["Installing JOTPOT Server Latest...","cp",["-R","JOTPOT-Server-master/*","/server"]],
+				["Installing JOTPOT Server Latest...","cp",["-f","-v","-R","JOTPOT-Server-master/*","/server"]],
 				["Cleaning up...","rm",["-R","JOTPOT-Server-master"]],
-				["Extracting electron (again), but for JPOS DE this time :)","unzip",["electron.zip","-d","/JPOS"]],
+				["Extracting electron (again), but for JPOS DE this time :)","unzip",["-o","electron.zip","-d","/JPOS"]],
 				["Cleaning up...","rm",["electron.zip"]],
 				["Setting up electron for JPOT DE...","mv",["/JPOS/electron","/JPOS/JPOS"]],
 				["Setting up electron for JPOT DE...","rm",["/JPOS/resources/default_app.asar"]],
 				["Setting up electron for JPOT DE...","rm",["/JPOS/resources/electron.asar"]],
 				["Downloading JPOS DE and JPOS DM...","wget",["-O","jpos-f.zip","https://www.jotpot.co.uk/experimental/JPOS/stableish.zip"]],
-				["Extracting and decompressing JPOS DE and JPOS DM...","unzip",["jpos-f.zip","-d","/JPOS/resources"]],
+				["Extracting and decompressing JPOS DE and JPOS DM...","unzip",["-o","jpos-f.zip","-d","/JPOS/resources"]],
 				["Cleaning up...","rm",["jpos-f.zip"]],
+				["Setting up the 'desktop' command...","wget",["-O","/JPOS/desktop","https://www.jotpot.co.uk/experimental/JPOS/desktop.sh"]],
+				["Setting up the 'desktop' command...","chmod",["+x","/JPOS/desktop"]],
+				["Modifying modes...","chmod",["+x","/JPOS/resources/shell/run.sh"]],
+				["Modifying modes...","chmod",["+x","/JPOS/resources/shell/login.sh"]],
+				["Downloading default settings...","wget",["-O","/JPOS/apps.json","https://www.jotpot.co.uk/experimental/JPOS/apps.json"]],
+				["Downloading default settings...","wget",["-O","/JPOS/settings.json","https://www.jotpot.co.uk/experimental/JPOS/settings.json"]],
+				["Downloading default settings...","wget",["-O","/JPOS/defaults.json","https://www.jotpot.co.uk/experimental/JPOS/defaults.json"]],
+				["Adding init scripts...","rm",["/etc/profile.d/JPOS.sh"]],
 				["Adding init scripts...","link",["/JPOS/resources/shell/run.sh","/etc/profile.d/JPOS.sh"]],
 				["Adding init scripts...","chmod",["+x","/etc/profile.d/JPOS.sh"]],
+				["Adding init scripts...","cp",["-f","-v","/etc/systemd/system/getty.target.wants/getty@tty1.service","tty1Orig"]],
+				["Adding init scripts...","rm",["/etc/systemd/system/getty.target.wants/getty@tty1.service"]],
 				["Adding init scripts...",_=>{
 					
-					let origF = fs.readFileSync("/etc/rc.local.old") ;
-					let newF = origF.split("\n") ;
-					newF.splice(1,0,"#JPOS systemcontrol server, this MUST be run for JPOS to function correctly...\nnode /JPOS/resources/shell/systemcontrol.js &") ;
-					newF = newF.join("\n") ;
+					let origF = fs.readFileSync("tty1Orig").toString().split("\n") ;
+					for (let doing in origF) {
+						
+						if (origF[doing].indexOf("ExecStart") === 0) {
+							
+							origF[doing] = "ExecStart=-/sbin/agetty --noclear -l /JPOS/resources/shell/login.sh -n --chdir /JPOS %I $TERM" ;
+							
+						}
+						
+					}
+					origF = origF.join("\n") ;
+					fs.writeFileSync("/etc/systemd/system/getty.target.wants/getty@tty1.service",origF) ;
+					
+				},"\n  Generating and saving new getty scripts...\n"],
+				["Adding init scripts...","chmod",["755","/etc/systemd/system/getty.target.wants/getty@tty1.service"]],
+				["Adding init scripts...",_=>{
+					
+					let newF ;
+					if (fs.existsSync("/etc/rc.local.old")) {
+						
+						let origF = fs.readFileSync("/etc/rc.local.old") ;
+						newF = origF.toString().split("\n") ;
+						newF.splice(1,0,"#JPOS systemcontrol server, this MUST be run for JPOS to function correctly...\n/usr/bin/node /JPOS/resources/shell/systemcontrol.js &") ;
+						newF = newF.join("\n") ;
+						
+					}
+					else {
+						
+						newF = "#!/bin/sh -e\n\n#JPOS systemcontrol server, this MUST be run for JPOS to function correctly...\n/usr/bin/node /JPOS/resources/shell/systemcontrol.js &\n\nexit 0" ;
+						
+					}
 					fs.writeFileSync("/etc/rc.local",newF) ;
 					
-				},"  Modifiying /etc/rc.local"],
+				},"\n  Modifiying /etc/rc.local\n"],
+				["Adding init scripts...","chmod",["+x","/etc/rc.local"]],
 				["DONE!!! Rebooting now!!!","reboot"]
 				
 			] ;
@@ -271,7 +347,21 @@
 						return ;
 						
 					}
-					doCommand(...stages[doing]).then(next) ;
+					doCommand(...stages[doing]).then(_=>{
+						
+						if (!slowMode) {
+							
+							next() ;
+							
+						}
+						
+						else {
+							
+							setTimeout(next,slowSpeed) ;
+							
+						}
+						
+					}) ;
 					
 				} ;
 				next() ;

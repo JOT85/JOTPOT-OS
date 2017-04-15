@@ -162,7 +162,7 @@ JOTPOT OS Login Manager
 					return;//?
 					
 				}
-				let usr = "jp" ;
+				let usr = document.getElementById("username").value ;
 				require("electron").ipcRenderer.send("go",launch,usr) ;
 				
 			}) ;

@@ -71,6 +71,9 @@ package("electron").then(_=>package("JPOS"))
 .then(_=>copyDir("shell"))
 .then(_=>copyM("./installer/installer.sh","./web-directory/installer.sh"))
 .then(_=>copyM("./installer/install-jpos","./web-directory/install-jpos"))
+.then(_=>copyM("./apps.json","./web-directory/apps.json"))
+.then(_=>copyM("./settings.json","./web-directory/settings.json"))
+.then(_=>copyM("./defaults.json","./web-directory/defaults.json"))
 .then(_=>packageM("./installer/installer.asar","./web-directory/installer.asar"))
 .then(_=>{
 	

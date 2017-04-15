@@ -31,3 +31,9 @@ require("electron").ipcMain.on("force-restart",_=>{
 	},5000) ;
 	
 }) ;
+
+require("electron").ipcMain.on("open-dev-tools",_=>{
+	
+	win.openDevTools() ;
+	
+}) ;

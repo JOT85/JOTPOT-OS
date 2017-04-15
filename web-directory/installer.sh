@@ -32,28 +32,46 @@ elif [ "$a" == "x86" ]
 then
 	a="ia32"
 fi
+function file {
+	if [ -f "$1" ] || [ -d "$1" ]
+	then
+		echo "'$1' already exists, renaming it to $1.old"
+		sleep 2
+		file "$1.old"
+		mv "$1" "$1.old"
+	fi
+}
+file "/server"
+file "/JPOS"
 electron_version="1.6.2"
-echo "Downloading precompiled version of electron v$electron_version for linux on $a from 'https://github.com/electron/electron/releases/download/v$electron_version/$electron_file.zip'..."
 electron_file="electron-v$electron_version-linux-$a"
-wget -O "electron.zip" "https://github.com/electron/electron/releases/download/v$electron_version/$electron_file.zip" >/dev/null
+echo ""
+echo "Downloading precompiled version of electron v$electron_version for linux on $a from 'https://github.com/electron/electron/releases/download/v$electron_version/$electron_file.zip'..."
+wget -O "electron.zip" "https://github.com/electron/electron/releases/download/v$electron_version/$electron_file.zip" >/dev/null 2>/dev/null
 echo "Extracting electron..."
-unzip "electron.zip" -d "installer" >/dev/null
+unzip -o "electron.zip" -d "installer" >/dev/null
 mv ./installer/electron ./installer/installer
 rm ./installer/resources/default_app.asar
-echo "Downloading JPOS installer scripts..."
-wget -O "./installer/resources/app.asar" "https://www.jotpot.co.uk/experimental/JPOS/installer.asar" >/dev/null
+echo ""
+echo "Downloading JPOS installer scripts from 'https://www.jotpot.co.uk/experimental/JPOS/installer.asar'..."
+wget -O "./installer/resources/app.asar" "https://www.jotpot.co.uk/experimental/JPOS/installer.asar" >/dev/null 2>/dev/null
 echo "Installing/Updating the X server..."
-apt-get -y install xinit >/dev/null
+echo "    This will either be really quick or take a VERY long time depending on the state of your system..."
+echo "    This process is very unlikely to hang, please give it time..."
+apt-get -y install xorg openbox xinit libxss1 >/dev/null 2>/dev/null
+echo ""
 echo "Changing boot target..."
-mv /etc/rc.local /etc/rc.local.old
+file /etc/rc.local
 echo "#!/bin/bash" >/etc/rc.local
 echo "exec < /dev/tty1" >>/etc/rc.local
-echo "exec 1 >/dev/tty1" >>/etc/rc.local
-echo "exec 2 >/dev/tty1" >>/etc/rc.local
+echo "exec >/dev/tty1" >>/etc/rc.local
 echo "cd /JPOS-install" >>/etc/rc.local
 echo "startx /JPOS-install/installer/installer >/dev/null" >>/etc/rc.local
 echo "exit 0" >>/etc/rc.local
+chmod +x /etc/rc.local
 systemctl set-default -f multi-user.target >/dev/null
-echo "Rebooting..."
+echo "Ready."
+echo "Rebooting in 5 seconds..."
+sleep 5
 reboot
 exit 0
