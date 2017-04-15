@@ -18,6 +18,8 @@
 				font-size: 50px;
 				box-sizing: border-box;
 				padding-left: 5%;
+				display: flex;
+				flex-direction: row;
 				
 			}
 			
@@ -25,6 +27,15 @@
 				
 				height: 50px;
 				margin-top: 12.5px;
+				
+			}
+			
+			#title-i {
+				
+				height: 75px;
+				line-height: 75px;
+				font-size: 55px;
+				padding-left: 10px;
 				
 			}
 			
@@ -89,7 +100,7 @@
 			}
 			
 		</style>
-		<div id="title"><img src="JPOS.png"> Installer</div>
+		<div id="title"><img src="JPOS.png"><div ID="title-i">Installer</div></div>
 		<div id="main">Just loading the installer...<br>Hang on a second...</div>
 		<div id="logs"></div>
 		<button type="button" ID="force-restart">Force Installer Restart (ONLY USE IN EMERGENCIES)</button>
@@ -97,7 +108,8 @@
 		<script type="text/javascript">
 			
 			let slowMode = true ;
-			let slowSpeed = 5000 ;
+			let slowSpeed = 2000 ;
+			let title = document.getElementById("title") ;
 			let main = document.getElementById("main") ;
 			let logs = document.getElementById("logs") ;
 			function updateMain(text) {
@@ -105,8 +117,8 @@
 				main.innerText = text ;
 				requestAnimationFrame(_=>{
 					
-					let md = main.getBoundingClientRect() ;
-					logs.style.height = window.innerHeight - (md.top * 2) - md.height ;
+					logs.style.height = window.innerHeight - main.getBoundingClientRect().bottom - title.getBoundingClientRect().top ;
+					requestAnimationFrame(_=>logs.scrollTop=logs.scrollHeight) ;
 					
 				}) ;
 				
@@ -333,7 +345,7 @@
 					}
 					
 					
-				},"\n  Modifying versions...\n"]
+				},"\n  Modifying versions...\n"],
 				["Setting up the 'desktop' command...","wget",["-O","/JPOS/desktop","https://www.jotpot.co.uk/experimental/JPOS/desktop.sh"]],
 				["Downloading default settings...","wget",["-O","/JPOS/apps.json","https://www.jotpot.co.uk/experimental/JPOS/apps.json"]],
 				["Downloading default settings...","wget",["-O","/JPOS/settings.json","https://www.jotpot.co.uk/experimental/JPOS/settings.json"]],
