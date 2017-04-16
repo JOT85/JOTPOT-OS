@@ -58,82 +58,98 @@ module.exports.copy = (file1,file2) => {
 							let go =_=> {
 								
 								fs.fstat(fd2,(err,stats2)=>{
+									
+									if (err) {
 										
-									fs.futimes(fd2,stats1.atime,stats1.mtime,err=>{
+										reject(err) ;
 										
-										if (err) {
-											
-											reject(err) ;
-											
-										}
+									}
+									
+									else if (stats2.isFile()) {
 										
-										else {
+										reject("Dest is a file...") ;
+										
+									}
+									
+									else {
+										
+										fs.futimes(fd2,stats1.atime,stats1.mtime,err=>{
 											
-											fs.fchmod(fd2,stats1.mode,err=>{
+											if (err) {
 												
-												if (err) {
-													
-													reject(err) ;
-													
-												}
+												reject(err) ;
 												
-												else {
-													
-													fs.chown(file2,stats1.uid,stats1.gid,err=>{
-														
-														if (err) {
-															
-															reject(err) ;
-															
-														}
-														
-														else {
-															
-															fs.readdir(file1,(err,dir)=>{
-																
-																if (err) {
-																	
-																	reject(err) ;
-																	
-																}
-																
-																else {
-																	
-																	let doing = -1 ;
-																	let next =_=> {
-																		
-																		doing++ ;
-																		
-																		if (doing >= dir.length) {
-																			
-																			resolve() ;
-																			
-																		}
-																		
-																		else {
-																			
-																			module.exports.copy(path.join(file1,dir[doing]),path.join(file2,dir[doing])).then(next) ;
-																			
-																		}
-																		
-																	} ;
-																	next() ;
-																	
-																}
-																
-															}) ;
-															
-														}
-														
-													}) ;
-													
-												}
-												
-											}) ;
+											}
 											
-										}
+											else {
+												
+												fs.fchmod(fd2,stats1.mode,err=>{
+													
+													if (err) {
+														
+														reject(err) ;
+														
+													}
+													
+													else {
+														
+														fs.chown(file2,stats1.uid,stats1.gid,err=>{
+															
+															if (err) {
+																
+																reject(err) ;
+																
+															}
+															
+															else {
+																
+																fs.readdir(file1,(err,dir)=>{
+																	
+																	if (err) {
+																		
+																		reject(err) ;
+																		
+																	}
+																	
+																	else {
+																		
+																		let doing = -1 ;
+																		let next =_=> {
+																			
+																			doing++ ;
+																			
+																			if (doing >= dir.length) {
+																				
+																				resolve() ;
+																				
+																			}
+																			
+																			else {
+																				
+																				module.exports.copy(path.join(file1,dir[doing]),path.join(file2,dir[doing])).then(next) ;
+																				
+																			}
+																			
+																		} ;
+																		next() ;
+																		
+																	}
+																	
+																}) ;
+																
+															}
+															
+														}) ;
+														
+													}
+													
+												}) ;
+												
+											}
+											
+										}) ;
 										
-									}) ;
+									}
 									
 								}) ;
 								
@@ -171,17 +187,7 @@ module.exports.copy = (file1,file2) => {
 							
 							else {
 								
-								if (stats2.isFile()) {
-									
-									reject("Dest is a file...") ;
-									
-								}
-								
-								else {
-									
-									go() ;
-									
-								}
+								go() ;
 								
 							}
 							
