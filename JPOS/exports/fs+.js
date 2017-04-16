@@ -52,8 +52,7 @@ module.exports.copy = (file1,file2) => {
 					
 					else if (stats1.isDirectory()) {
 						
-						console.log("Is dir")
-						fs.open(file2,"r",(err,fd2)=>{
+						fs.open(file2,"r+",(err,fd2)=>{
 							
 							let go =_=> {
 								
