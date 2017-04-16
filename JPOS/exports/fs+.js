@@ -65,8 +65,10 @@ module.exports.copy = (file1,file2) => {
 									
 									let go =_=> {
 										
+										console.log("Bet this") ;
 										fs.futimes(fd2,stats1.atime,stats1.mtime,err=>{
 											
+											console.log(err) ;
 											if (err) {
 												
 												reject(err) ;
