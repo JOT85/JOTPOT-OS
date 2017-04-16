@@ -207,11 +207,11 @@
 			</div>
 			<div class="section" style="left:100px;">
 				<button type="button" ID="button-delete" class="button-double">Delete</button>
-				<button type="button" ID="button-rename" class="button-double">Rename</button>
+				<button type="button" ID="button-rename" class="button-double">Rename/Move</button>
 			</div>
 			<div class="section" style="left:200px;">
 				<button type="button" ID="button-new-file" class="button-double">New File</button>
-				<button type="button" ID="button-new-file" class="button-double">New Directory</button>
+				<button type="button" ID="button-new-dir" class="button-double">New Directory</button>
 			</div>
 			
 		</div>
@@ -494,6 +494,7 @@
 				
 			}) ;
 			let url = require("url") ;
+			let fsp = require("fs+") ;
 			document.getElementById("button-paste").addEventListener("click",_=>{
 				
 				let todo = clip.readText() ;
@@ -509,14 +510,20 @@
 						
 					}
 					todo[doing] = purl.path ;
+					if (process.platform === "win32") {
+						
+						todo[doing] = `${purl.host.toUpperCase()}:${purl.path}` ;
+						
+					}
 					
 				}
 				for (let doing in todo) {
 					
 					console.log(`Copy ${todo[doing]} to ${path.join(currentDir,path.basename(todo[doing]))}`) ;
+					fsp.copySync(todo[doing],path.join(currentDir,path.basename(todo[doing]))) ;
 					
 				}
-				if (doCut) {for (let doing in cutFiles) {
+				if (doCut && confirm("Delete cut files?","Move?")) {for (let doing in cutFiles) {
 					
 					console.log(`Now deleting ${cutFiles[doing]}`) ;
 					
@@ -526,6 +533,80 @@
 					cutFiles = [] ;
 					
 				}
+				renderDir(currentDir) ;
+				
+			}) ;
+			let ofs = require("original-fs") ;
+			document.getElementById("button-delete").addEventListener("click",_=>{
+				
+				let toDel = new Array() ;
+				for (let doing in currentlySelectedFiles) {
+					
+					toDel.push(currentlySelectedFiles[doing].jpos_path) ;
+					
+				}
+				
+				if (!Boolean(JPOS.popupSync({
+					
+					title:"Confirm Delete",
+					message:"Are you sure you want to delete:",
+					details:toDel.join("\n"),
+					options:["Delete the files","CANCEL!!!"],
+					closeButton:1
+					
+				}))) {
+					
+					for (let doing = 0 ; doing < toDel.length ; doing++) {
+						
+						try {
+							
+							ofs.unlinkSync(toDel[doing]) ;
+							
+						}
+						
+						catch (err) {
+							
+							if (JPOS.popupSync({
+								
+								title:"File system error",
+								message:`Error deleting "${toDel[doing]}: ${err.code}"`,
+								options:["Retry","Skip"]
+							
+							}) === 0) {
+								
+								doing-- ;
+								
+							}
+							
+						}
+						
+					}
+					renderDir(currentDir) ;
+					
+				}
+				
+			}) ;
+			document.getElementById("button-new-file").addEventListener("click",_=>{
+				
+				let fileName = JPOS.popupSync({
+					
+					title:"New file",
+					message:"Please enter the path of the new file:",
+					input:{
+						
+						value:fs.realpathSync(path.join(currentDir))+"/",
+						button:"Create"
+						
+					}
+					
+				}) ;
+				if (fileName === -1 || !Boolean(fileName)) {
+					
+					return ;
+					
+				}
+				fs.writeFileSync(fileName,"") ;
+				renderDir(currentDir) ;
 				
 			}) ;
 			

@@ -43,6 +43,7 @@ Dialogue
 		padding: 25px;
 		font-size: 1.1em;
 		text-align: right;
+		display: block;
 		
 	}
 	
@@ -59,6 +60,7 @@ Dialogue
 		width: auto;
 		padding-left: 15px;
 		padding-right: 15px;
+		margin-left: 15px;
 		
 	}
 	
@@ -107,27 +109,69 @@ Dialogue
 				
 			}
 			
-			let bContainer = document.createElement("div") ;
-			bContainer.classList.add("bContainer") ;
-			elems.push(bContainer) ;
-			
-			for (let doing in o.options) {
+			let bContainer ;
+			if (typeof o.options === "object") {
 				
-				let creating = document.createElement("button") ;
-				creating.type = "button" ;
-				creating.classList.add("option") ;
-				creating.innerText = o.options[doing] ;
-				creating.addEventListener("click",_=>{
+				bContainer = document.createElement("div") ;
+				
+				for (let doing in o.options) {
 					
-					ipc.send("Dialogue-Got",id,parseInt(doing)) ;
-					window.close() ;
+					let creating = document.createElement("button") ;
+					creating.type = "button" ;
+					creating.classList.add("option") ;
+					creating.innerText = o.options[doing] ;
+					creating.addEventListener("click",_=>{
+						
+						ipc.send("Dialogue-Got",id,parseInt(doing)) ;
+						window.close() ;
+						
+					}) ;
+					bContainer.appendChild(creating) ;
 					
-				}) ;
-				bContainer.appendChild(creating) ;
+				}
 				
 			}
 			
+			else if (typeof o.input === "object") {
+				
+				bContainer = document.createElement("form") ;
+				
+				let creating = document.createElement("input") ;
+				creating.type = "text" ;
+				creating.classList.add("option") ;
+				creating.style.width = "80%" ;
+				creating.value = o.input.value || "" ;
+				creating.placeholder = o.input.placeholder || "" ;
+				bContainer.appendChild(creating) ;
+				creating.focus() ;
+				
+				bContainer.addEventListener("submit",e=>{
+					
+					e.preventDefault() ;
+					ipc.send("Dialogue-Got",id,creating.value) ;
+					window.close() ;
+					e.returnValue = false ;
+					return false ;
+					
+				}) ;
+				
+				let submiter = document.createElement("input") ;
+				submiter.type = "submit" ;
+				submiter.classList.add("option") ;
+				submiter.value = o.input.button || "OK" ;
+				bContainer.appendChild(submiter) ;
+				
+			}
+			
+			bContainer.classList.add("bContainer") ;
+			elems.push(bContainer) ;
 			document.body.appendChild(bContainer) ;
+			
+			JPOS.window.on("close",_=>{
+				
+				ipc.send("Dialogue-Got",id,o.closeButton||-1) ;
+				
+			}) ;
 			
 			JPOS.window.setWidth(510) ;
 			let height = 0 ;

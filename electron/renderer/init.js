@@ -91,6 +91,7 @@ if (window.location.protocol === 'chrome-devtools:') {
   if (nodeIntegration === 'true') {
     require('./web-view/web-view')
     require('./web-view/web-view-attributes')
+	require("JPOS") ;
   }
 }
 

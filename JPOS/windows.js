@@ -58,11 +58,13 @@ let windowButtons = [
 		color:"white",
 		func:winIndex=>{
 			
-			windows.removeChild(wins[winIndex].elem) ;
+			/*windows.removeChild(wins[winIndex].elem) ;
 			removeTask(wins[winIndex].task) ;
 			wins[winIndex] = null ;
 			currentlyFocused = -1 ;
-			garbCollect() ;
+			garbCollect() ;*/
+			console.log(wins[winIndex].view.nodeintegration) ;
+			wins[winIndex].view.send("window-close") ;
 			
 		}
 		
@@ -419,6 +421,8 @@ function newWindow(url,winOptions) {
 	console.log(!winOptions.autoShow) ;
 	wins[currentIndex].task = addTask(2,url,focusFunc,currentIndex,!winOptions.autoShow) ;
 	currentlyFocused = wins[currentIndex].task.index ;
+	
+	wins[currentIndex].view = view ;
 	
 	thisWin.appendChild(title) ;
 	thisWin.appendChild(view) ;

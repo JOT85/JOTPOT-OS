@@ -1,11 +1,20 @@
-let fs = require("fs") ;
+let fs ;
+try {
+	
+	fs = require("original-fs")
+	
+}
+
+catch (err) {
+	
+	fs = require("fs") ;
+	
+}
 let path = require("path") ;
 module.exports.copy = (file1,file2) => {
 	
-	console.log("Woo") ;
 	return new Promise((resolve,reject)=>{
 		
-		console.log("Opeining 1...") ;
 		fs.open(file1,"r",(err,fd1)=>{
 			
 			if (err) {
@@ -16,7 +25,6 @@ module.exports.copy = (file1,file2) => {
 			
 			else {
 				
-				console.log("Stating 1...") ;
 				fs.fstat(fd1,(err,stats1)=>{
 					
 					if (err) {
@@ -27,24 +35,21 @@ module.exports.copy = (file1,file2) => {
 					
 					else if (stats1.isDirectory()) {
 						
-						console.log("Stating 2 (dir mode)...") ;
-						fs.stat(file2,(err,stats2)=>{
+						fs.open(file2,"r+",(err,fd2)=>{
 							
-							let go =_=> {
+							if (err) {
 								
-								console.log("Modding 2 (dir mode)...") ;
-								fs.chmod(file2,stats1.mode,err=>{
+								reject(err) ;
+								
+							}
+							
+							else {
+								
+								fs.fstat(fd2,(err,stats2)=>{
 									
-									if (err) {
+									let go =_=> {
 										
-										reject(err) ;
-										
-									}
-									
-									else {
-										
-										console.log("Owning 2 (dir mode)...") ;
-										fs.chown(file2,stats1.uid,stats1.gid,err=>{
+										fs.futimes(fd2,stats1.atime,stats1.mtime,err=>{
 											
 											if (err) {
 												
@@ -54,8 +59,7 @@ module.exports.copy = (file1,file2) => {
 											
 											else {
 												
-												console.log("Reading 1 (dir mode)...") ;
-												fs.readdir(file1,(err,dir)=>{
+												fs.fchmod(fd2,stats1.mode,err=>{
 													
 													if (err) {
 														
@@ -65,27 +69,53 @@ module.exports.copy = (file1,file2) => {
 													
 													else {
 														
-														console.log("Dir contents",dir) ;
-														let doing = -1 ;
-														let next =_=> {
+														fs.chown(file2,stats1.uid,stats1.gid,err=>{
 															
-															doing++ ;
-															
-															if (doing >= dir.length) {
+															if (err) {
 																
-																resolve() ;
+																reject(err) ;
 																
 															}
 															
 															else {
 																
-																console.log(`Copying ${path.join(file1,dir[doing])} to ${path.join(file2,dir[doing])}`) ;
-																module.exports.copy(path.join(file1,dir[doing]),path.join(file2,dir[doing])).then(next) ;
+																fs.readdir(file1,(err,dir)=>{
+																	
+																	if (err) {
+																		
+																		reject(err) ;
+																		
+																	}
+																	
+																	else {
+																		
+																		let doing = -1 ;
+																		let next =_=> {
+																			
+																			doing++ ;
+																			
+																			if (doing >= dir.length) {
+																				
+																				resolve() ;
+																				
+																			}
+																			
+																			else {
+																				
+																				module.exports.copy(path.join(file1,dir[doing]),path.join(file2,dir[doing])).then(next) ;
+																				
+																			}
+																			
+																		} ;
+																		next() ;
+																		
+																	}
+																	
+																}) ;
 																
 															}
 															
-														} ;
-														next() ;
+														}) ;
 														
 													}
 													
@@ -95,21 +125,43 @@ module.exports.copy = (file1,file2) => {
 											
 										}) ;
 										
-									}
+									} ;
 									
-								}) ;
-								
-							} ;
-							
-							if (err) {
-								
-								if (err.code === "ENOENT") {
-									
-									fs.mkdir(file2,err=>{
+									if (err) {
 										
-										if (err) {
+										if (err.code === "ENOENT") {
+											
+											fs.mkdir(file2,err=>{
+												
+												if (err) {
+													
+													reject(err) ;
+													
+												}
+												
+												else {
+													
+													go() ;
+													
+												}
+												
+											}) ;
+											
+										}
+										
+										else {
 											
 											reject(err) ;
+											
+										}
+										
+									}
+									
+									else {
+										
+										if (stats2.isFile()) {
+											
+											reject("Dest is a file...") ;
 											
 										}
 										
@@ -119,31 +171,9 @@ module.exports.copy = (file1,file2) => {
 											
 										}
 										
-									}) ;
+									}
 									
-								}
-								
-								else {
-									
-									reject(err) ;
-									
-								}
-								
-							}
-							
-							else {
-								
-								if (stats2.isFile()) {
-									
-									reject("Dest is a file...") ;
-									
-								}
-								
-								else {
-									
-									go() ;
-									
-								}
+								}) ;
 								
 							}
 							
@@ -153,7 +183,6 @@ module.exports.copy = (file1,file2) => {
 					
 					else {
 						
-						console.log("Opening 2...") ;
 						fs.open(file2,"w",(err,fd2)=>{
 							
 							if (err) {
@@ -164,7 +193,6 @@ module.exports.copy = (file1,file2) => {
 							
 							else {
 								
-								console.log("Piping...") ;
 								let write = fs.createWriteStream(file2,{
 									
 									fd:fd2
@@ -179,8 +207,7 @@ module.exports.copy = (file1,file2) => {
 								
 								read.on("end",_=>{
 									
-									console.log("Setting mode...") ;
-									fs.fchmod(fd2,stats1.mode,err=>{
+									fs.futimes(fd2,stats1.atime,stats1.mtime,err=>{
 										
 										if (err) {
 											
@@ -190,8 +217,7 @@ module.exports.copy = (file1,file2) => {
 										
 										else {
 											
-											console.log("Moding ownership...") ;
-											fs.chown(file2,stats1.uid,stats1.gid,err=>{
+											fs.chmod(file2,stats1.mode,err=>{
 												
 												if (err) {
 													
@@ -201,7 +227,21 @@ module.exports.copy = (file1,file2) => {
 												
 												else {
 													
-													resolve() ;
+													fs.chown(file2,stats1.uid,stats1.gid,err=>{
+														
+														if (err) {
+															
+															reject(err) ;
+															
+														}
+														
+														else {
+															
+															resolve() ;
+															
+														}
+														
+													}) ;
 													
 												}
 												
@@ -228,5 +268,88 @@ module.exports.copy = (file1,file2) => {
 		}) ;
 		
 	}) ;
+	
+} ;
+
+module.exports.copySync = (file1,file2) => {
+	
+	let fd1 = fs.openSync(file1,"r") ;
+	let stats1 = fs.fstatSync(fd1) ;
+	
+	if (stats1.isDirectory()) {
+		
+		let fd2 = fs.openSync(file2,"r+") ;
+		
+		let go =_=> {
+			
+			fs.futimesSync(fd2,stats1.atime,stats1.mtime) ;
+			fs.fchmodSync(fd2,stats1.mode) ;
+			fs.chownSync(file2,stats1.uid,stats1.gid) ;
+			let dir = fs.readdirSync(file1) ;
+			
+			for (let doing in dir) {
+				
+				console.log("Doing",doing) ;
+				module.exports.copySync(path.join(file1,dir[doing]),path.join(file2,dir[doing])) ;
+				
+			}
+			
+		} ;
+		
+		let stats2 ;
+		try {
+			
+			stats2 = fs.fstatSync(fd2,"w") ;
+			
+		}
+		
+		catch(err) {
+			
+			if (err.code === "ENOENT") {
+				
+				fs.mkdirSync(file2) ;
+				go() ;
+				return ;
+				
+			}
+			
+			else {
+				
+				throw err ;
+				return ;
+				
+			}
+		
+		}
+		
+		finally {
+			
+			if (stats2.isFile()) {
+				
+				throw "Dest is a file..." ;
+				
+			}
+			
+			else {
+				
+				go() ;
+				return ;
+				
+			}
+			
+		}
+		
+	}
+	
+	else {
+		
+		let fd2 = fs.openSync(file2,"w") ;
+		fs.writeSync(fd2,fs.readFileSync(file1)) ;
+		fs.futimesSync(fd2,stats1.atime,stats1.mtime) ;
+		fs.fchmodSync(fd2,stats1.mode) ;
+		fs.chownSync(file2,stats1.uid,stats1.gid) ;
+		return ;
+		
+	}
 	
 } ;
