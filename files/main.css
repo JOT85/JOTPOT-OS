@@ -1,0 +1,202 @@
+/*
+	Copyright 2017 Jacob O'Toole
+	
+	Licensed under the Apache License, Version 2.0 (the "License");
+	you may not use this file except in compliance with the License.
+	You may obtain a copy of the License at
+	
+	    http://www.apache.org/licenses/LICENSE-2.0
+	
+	Unless required by applicable law or agreed to in writing, software
+	distributed under the License is distributed on an "AS IS" BASIS,
+	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+	See the License for the specific language governing permissions and
+	limitations under the License.
+*/
+
+.item {
+	
+	background-color: #bbb;
+	padding: 3px;
+	padding-left: 30px;
+	background-repeat: no-repeat;
+	height: 25px;
+	display: block;
+	background-position: 5px center;
+	line-height: 25px;
+	
+}
+
+.item:hover {
+	
+	background-color: #ccc;
+	
+}
+
+.item.selected {
+	
+	background-color: #67c;
+	
+}
+
+.dir {
+	
+	background-image: url('dir.png');
+	background-size: 20px auto;
+	
+}
+
+.file-err {
+	
+	background-image: url('x.png');
+	background-size: 20px 20px;
+	
+}
+
+.file {
+	
+	background-image: url('file.png');
+	background-size: auto 17.5px;
+	
+}
+
+html,body {
+	
+	background-color: white;
+	margin: 0px;
+	padding: 0px;
+	font-family: Arial, Helvetica, sans-serif;
+	
+}
+
+#nav {
+	
+	position: absolute;
+	top: 0px;
+	width: 0px;
+	width: 100vw;
+	height: 100px;
+	background-color: #aaa;
+	padding: 0px;
+	margin: 0px;
+	
+}
+
+.section button {
+	
+	background-color: #666;
+	border-style: solid;
+	border-width: 1px;
+	border-color: #ddd;
+	
+}
+
+.section button:hover {
+	
+	background-color: #888;
+	
+}
+
+.button-single {
+	
+	margin: 0px;
+	padding: 0px;
+	box-sizing: border-box;
+	text-align: center;
+	height: 25px;
+	line-height: 23px;
+	display: block;
+	width: 100px;
+	
+}
+
+.button-double {
+	
+	margin: 0px;
+	padding: 0px;
+	box-sizing: border-box;
+	text-align: center;
+	height: 50px;
+	line-height: 48px;
+	display: block;
+	width: 100px;
+	
+}
+
+.section {
+	
+	display: block;
+	position: absolute;
+	top: 0px;
+	left: 0px;
+	
+}
+
+ul {
+	
+	display: block;
+	position: absolute;
+	left: 0px;
+	width: 100vw;
+	top: 130px;
+	height: calc(100vh - 130px);
+	overflow: auto;
+	margin: 0px;
+	padding: 0px;
+	
+}
+
+#location {
+	
+	height: 30px;
+	width: 100vw;
+	display: block;
+	position: absolute;
+	left: 0px;
+	top: 100px;
+	box-sizing: border-box;
+	line-height: 30px;
+	padding: 0px;
+	padding-left: 10px;
+	
+}
+
+#box button,#box input[type="submit"] {
+	
+	display: block;
+	position: absolute;
+	top: 100px;
+	height: 30px;
+	width: 30px;
+	line-height: 30px;
+	text-align: center;
+	background-position: center center;
+	background-repeat: no-repeat;
+	padding: 0px;
+	margin: 0px;
+	border-style: none;
+	background-color: transparent;
+	
+}
+
+#box button:hover,#box input[type="submit"]:hover {
+	
+	background-color: #ccc;
+	
+}
+
+#go {
+	
+	background-image: url('go.png');
+	background-size: 25px auto;
+	right: 5px;
+	
+}
+
+#up {
+	
+	background-image: url('up.png');
+	background-size: auto 25px;
+	right: 40px;
+	
+}
