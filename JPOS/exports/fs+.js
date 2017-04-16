@@ -355,7 +355,7 @@ module.exports.copySync = (file1,file2) => {
 		fs.writeSync(fd2,fs.readFileSync(file1)) ;
 		fs.futimesSync(fd2,stats1.atime,stats1.mtime) ;
 		fs.fchmodSync(fd2,stats1.mode) ;
-		fs.chownSync(file2,stats1.uid,stats1.gid) ;
+		fs.chownSync(file2,stats1.uid,stats1.gid) ; 
 		return ;
 		
 	}
