@@ -1,0 +1,23 @@
+[
+	
+	{
+		
+		"name":"Scougall Chrome",
+		"icon":"../scougall-chrome.asar/s.png",
+		"start":"../scougall-chrome.asar/index.html",
+		"node":true,
+		"files":[".html",".htm",".txt",".pdf"]
+		
+	},
+	
+	{
+		
+		"name":"File Manager",
+		"icon":"../files.asar/file.png",
+		"start":"../files.asar/index.html",
+		"node":true,
+		"files":[]
+		
+	}
+	
+]
