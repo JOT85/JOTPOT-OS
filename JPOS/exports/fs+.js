@@ -55,112 +55,21 @@ module.exports.copy = (file1,file2) => {
 						console.log("Is dir")
 						fs.open(file2,"r",(err,fd2)=>{
 							
-							console.log("Now opened...",err) ;
-							
-							if (err) {
-								
-								if (err.code === "ENOENT") {
-									
-									
-									
-								}
-								
-								reject(err) ;
-								
-							}
-							
-							else {
+							let go =_=> {
 								
 								fs.fstat(fd2,(err,stats2)=>{
-									
-									console.log("Statted") ;
-									let go =_=> {
 										
-										console.log("Bet this") ;
-										fs.futimes(fd2,stats1.atime,stats1.mtime,err=>{
-											
-											console.log(err) ;
-											if (err) {
-												
-												reject(err) ;
-												
-											}
-											
-											else {
-												
-												fs.fchmod(fd2,stats1.mode,err=>{
-													
-													if (err) {
-														
-														reject(err) ;
-														
-													}
-													
-													else {
-														
-														fs.chown(file2,stats1.uid,stats1.gid,err=>{
-															
-															if (err) {
-																
-																reject(err) ;
-																
-															}
-															
-															else {
-																
-																fs.readdir(file1,(err,dir)=>{
-																	
-																	if (err) {
-																		
-																		reject(err) ;
-																		
-																	}
-																	
-																	else {
-																		
-																		let doing = -1 ;
-																		let next =_=> {
-																			
-																			doing++ ;
-																			
-																			if (doing >= dir.length) {
-																				
-																				resolve() ;
-																				
-																			}
-																			
-																			else {
-																				
-																				module.exports.copy(path.join(file1,dir[doing]),path.join(file2,dir[doing])).then(next) ;
-																				
-																			}
-																			
-																		} ;
-																		next() ;
-																		
-																	}
-																	
-																}) ;
-																
-															}
-															
-														}) ;
-														
-													}
-													
-												}) ;
-												
-											}
-											
-										}) ;
+									fs.futimes(fd2,stats1.atime,stats1.mtime,err=>{
 										
-									} ;
-									
-									if (err) {
-										
-										if (err.code === "ENOENT") {
+										if (err) {
 											
-											fs.mkdir(file2,err=>{
+											reject(err) ;
+											
+										}
+										
+										else {
+											
+											fs.fchmod(fd2,stats1.mode,err=>{
 												
 												if (err) {
 													
@@ -170,7 +79,53 @@ module.exports.copy = (file1,file2) => {
 												
 												else {
 													
-													go() ;
+													fs.chown(file2,stats1.uid,stats1.gid,err=>{
+														
+														if (err) {
+															
+															reject(err) ;
+															
+														}
+														
+														else {
+															
+															fs.readdir(file1,(err,dir)=>{
+																
+																if (err) {
+																	
+																	reject(err) ;
+																	
+																}
+																
+																else {
+																	
+																	let doing = -1 ;
+																	let next =_=> {
+																		
+																		doing++ ;
+																		
+																		if (doing >= dir.length) {
+																			
+																			resolve() ;
+																			
+																		}
+																		
+																		else {
+																			
+																			module.exports.copy(path.join(file1,dir[doing]),path.join(file2,dir[doing])).then(next) ;
+																			
+																		}
+																		
+																	} ;
+																	next() ;
+																	
+																}
+																
+															}) ;
+															
+														}
+														
+													}) ;
 													
 												}
 												
@@ -178,19 +133,21 @@ module.exports.copy = (file1,file2) => {
 											
 										}
 										
-										else {
+									}) ;
+									
+								}) ;
+								
+							} ;
+							
+							if (err) {
+										
+								if (err.code === "ENOENT") {
+									
+									fs.mkdir(file2,err=>{
+										
+										if (err) {
 											
 											reject(err) ;
-											
-										}
-										
-									}
-									
-									else {
-										
-										if (stats2.isFile()) {
-											
-											reject("Dest is a file...") ;
 											
 										}
 										
@@ -200,9 +157,31 @@ module.exports.copy = (file1,file2) => {
 											
 										}
 										
-									}
+									}) ;
 									
-								}) ;
+								}
+								
+								else {
+									
+									reject(err) ;
+									
+								}
+								
+							}
+							
+							else {
+								
+								if (stats2.isFile()) {
+									
+									reject("Dest is a file...") ;
+									
+								}
+								
+								else {
+									
+									go() ;
+									
+								}
 								
 							}
 							
