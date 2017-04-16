@@ -29,6 +29,7 @@ catch (err) {
 let path = require("path") ;
 module.exports.copy = (file1,file2) => {
 	
+	console.log("Copying",file2,"to",file2) ;
 	return new Promise((resolve,reject)=>{
 		
 		fs.open(file1,"r",(err,fd1)=>{
@@ -51,9 +52,18 @@ module.exports.copy = (file1,file2) => {
 					
 					else if (stats1.isDirectory()) {
 						
-						fs.open(file2,"r+",(err,fd2)=>{
+						console.log("Is dir")
+						fs.open(file2,"r",(err,fd2)=>{
+							
+							console.log("Now opened...",err) ;
 							
 							if (err) {
+								
+								if (err.code === "ENOENT") {
+									
+									
+									
+								}
 								
 								reject(err) ;
 								
@@ -63,6 +73,7 @@ module.exports.copy = (file1,file2) => {
 								
 								fs.fstat(fd2,(err,stats2)=>{
 									
+									console.log("Statted") ;
 									let go =_=> {
 										
 										console.log("Bet this") ;
