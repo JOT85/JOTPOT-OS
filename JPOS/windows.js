@@ -584,26 +584,5 @@ document.body.addEventListener("mousemove",e=>{
 }) ;
 document.body.addEventListener("mouseup",_=>endDown(currentlyMoving)) ;
 
-let keys = new Object() ;
-document.body.addEventListener("keydown",e=>{
-	
-	console.log(e.key) ;
-	if (e.key === "Alt") {
-		
-		keys.AltDown = true ;
-		
-	}
-	
-}) ;
-document.body.addEventListener("keyup",e=>{
-	
-	console.log(e.key) ;
-	if (e.key === "Alt") {
-		
-		keys.AltDown = false ;
-		
-	}
-	
-}) ;
 
 ipc.on("newWindow",(m,d)=>newWindow(...d)) ;

@@ -14,15 +14,28 @@
 	limitations under the License.
 */
 
-let currentDir = "/" ;
-let fs = require("fs") ;
+let url = require("url") ;
+let currentDir = defaultLocation = process.platform==="win32"?url.parse(process.cwd()).protocol.toUpperCase()+"\\":"/" ;
 let path = require("path") ;
 let JPOS = require("JPOS") ;
+let clip = require("electron").clipboard ;
+let fs = require("fs") ;
+let fsp = require("fs+") ;
+let ofs = require("original-fs") ;
+let os = require("os") ;
 
 let list = document.getElementById("list") ;
 let locationInput = document.getElementById("location") ;
 let box = document.getElementById("box") ;
 let upButton = document.getElementById("up") ;
+
+let sidebar = document.getElementById("sidebar") ;
+let shortcuts = [
+	
+	["Root directory",defaultLocation],
+	["Home directory",os.homedir()]
+	
+] ;
 
 function giveMeErrors(err) {
 	
@@ -49,9 +62,9 @@ function addSelectListeners(elem,openFunc) {
 				for (let doing in currentlySelectedFiles) {
 					
 					currentlySelectedFiles[doing].classList.remove("selected") ;
-					currentlySelectedFiles = [] ;
 					
 				}
+				currentlySelectedFiles = [] ;
 				
 			}
 			
@@ -73,7 +86,14 @@ function addSelectListeners(elem,openFunc) {
 function renderDir(d) {
 	
 	console.log("Rendering",d) ;
+	locationInput.value = d ;
 	list.innerHTML = "" ;
+	for (let doing in currentlySelectedFiles) {
+		
+		currentlySelectedFiles[doing].classList.remove("selected") ;
+		
+	}
+	currentlySelectedFiles = [] ;
 	fs.readdir(d,(err,dir)=>{
 		
 		if (err) {
@@ -118,7 +138,7 @@ function renderDir(d) {
 					addSelectListeners(creating,_=>{
 						
 						currentDir = path.join(d,dirs[doing]) ;
-						locationInput.value = currentDir ;
+						//locationInput.value = currentDir ;
 						renderDir(currentDir) ;
 						
 					}) ;
@@ -195,10 +215,10 @@ upButton.addEventListener("click",_=>{
 	currentDir = currentDir.join("/") ;
 	if (currentDir === "") {
 		
-		currentDir = "/" ;
+		currentDir = defaultLocation ;
 		
 	}
-	locationInput.value = currentDir ;
+	//locationInput.value = currentDir ;
 	renderDir(currentDir) ;
 	
 }) ;
@@ -223,8 +243,7 @@ document.body.addEventListener("keyup",e=>{
 	
 }) ;
 
-let clip = require("electron").clipboard ;
-document.getElementById("button-copy").addEventListener("click",_=>{
+function copy() {
 	
 	let toAdd = new String() ;
 	cutFiles = [] ;
@@ -241,8 +260,9 @@ document.getElementById("button-copy").addEventListener("click",_=>{
 	}
 	clip.writeText(toAdd) ;
 	
-}) ;
-document.getElementById("button-copy-path").addEventListener("click",_=>{
+}
+
+function copyPath() {
 	
 	let toAdd = new String() ;
 	for (let doing in currentlySelectedFiles) {
@@ -257,10 +277,9 @@ document.getElementById("button-copy-path").addEventListener("click",_=>{
 	}
 	clip.writeText(toAdd) ;
 	
-}) ;
-let cutFiles = new Array() ;
-let cutFilesClip = new String() ;
-document.getElementById("button-cut").addEventListener("click",_=>{
+}
+
+function cut() {
 	
 	let toAdd = new String() ;
 	cutFiles = [] ;
@@ -279,10 +298,9 @@ document.getElementById("button-cut").addEventListener("click",_=>{
 	cutFilesClip = toAdd ;
 	clip.writeText(toAdd) ;
 	
-}) ;
-let url = require("url") ;
-let fsp = require("fs+") ;
-document.getElementById("button-paste").addEventListener("click",_=>{
+}
+
+function paste() {
 	
 	let todo = clip.readText() ;
 	let doCut = Boolean(todo===cutFilesClip) ;
@@ -307,7 +325,67 @@ document.getElementById("button-paste").addEventListener("click",_=>{
 	for (let doing in todo) {
 		
 		console.log(`Copy ${todo[doing]} to ${path.join(currentDir,path.basename(todo[doing]))}`) ;
-		fsp.copySync(todo[doing],path.join(currentDir,path.basename(todo[doing]))) ;
+		userSaidGo = false ;
+		userSaidNo = false ;
+		fsp.copySync(todo[doing],path.join(currentDir,path.basename(todo[doing])),(path1,path2,callback)=>{
+			
+			if (userSaidNo) {
+				
+				return 1 ;
+				
+			}
+			
+			else if (userSaidGo) {
+				
+				return 2 ;
+				
+			}
+			
+			else {
+				
+				let woo = JPOS.popupSync({
+					
+					"title":"Overwrite?",
+					"message":`Overwrite '${path2}' with '${path1}'?`,
+					"options":["Overwrite all","Overwrite","Skip","Skip all","Cancel Paste"]
+					
+				}) ;
+				
+				if (woo === 0) {
+					
+					userSaidGo = true ;
+					return 2 ;
+					
+				}
+				
+				else if (woo === 1) {
+					
+					return 2 ;
+					
+				}
+				
+				else if (woo === 2) {
+					
+					return 1 ;
+					
+				}
+				
+				else if (woo === 3) {
+					
+					userSaidNo = true ;
+					return 1 ;
+					
+				}
+				
+				else {
+					
+					return 0 ;
+					
+				}
+				
+			}
+			
+		}) ;
 		
 	}
 	if (doCut && confirm("Delete cut files?","Move?")) {for (let doing in cutFiles) {
@@ -322,9 +400,9 @@ document.getElementById("button-paste").addEventListener("click",_=>{
 	}
 	renderDir(currentDir) ;
 	
-}) ;
-let ofs = require("original-fs") ;
-document.getElementById("button-delete").addEventListener("click",_=>{
+}
+
+function del() {
 	
 	let toDel = new Array() ;
 	for (let doing in currentlySelectedFiles) {
@@ -332,6 +410,7 @@ document.getElementById("button-delete").addEventListener("click",_=>{
 		toDel.push(currentlySelectedFiles[doing].jpos_path) ;
 		
 	}
+	console.log(toDel) ;
 	
 	if (!Boolean(JPOS.popupSync({
 		
@@ -347,7 +426,8 @@ document.getElementById("button-delete").addEventListener("click",_=>{
 			
 			try {
 				
-				ofs.unlinkSync(toDel[doing]) ;
+				console.log("Passing",toDel[doing]) ;
+				fsp.deleteSync(toDel[doing]) ;
 				
 			}
 			
@@ -372,8 +452,9 @@ document.getElementById("button-delete").addEventListener("click",_=>{
 		
 	}
 	
-}) ;
-document.getElementById("button-new-file").addEventListener("click",_=>{
+}
+
+function newFile() {
 	
 	let fileName = JPOS.popupSync({
 		
@@ -381,7 +462,7 @@ document.getElementById("button-new-file").addEventListener("click",_=>{
 		message:"Please enter the path of the new file:",
 		input:{
 			
-			value:fs.realpathSync(path.join(currentDir))+"/",
+			value:fs.realpathSync(path.join(currentDir))+path.sep,
 			button:"Create"
 			
 		}
@@ -395,6 +476,119 @@ document.getElementById("button-new-file").addEventListener("click",_=>{
 	fs.writeFileSync(fileName,"") ;
 	renderDir(currentDir) ;
 	
+}
+
+function newDir() {
+	
+	let fileName = JPOS.popupSync({
+		
+		title:"New directory",
+		message:"Please enter the path of the new directory:",
+		input:{
+			
+			value:fs.realpathSync(path.join(currentDir))+path.sep,
+			button:"Create"
+			
+		}
+		
+	}) ;
+	if (fileName === -1 || !Boolean(fileName)) {
+		
+		return ;
+		
+	}
+	fs.mkdirSync(fileName) ;
+	renderDir(currentDir) ;
+	
+}
+
+function rename() {
+	
+	for (let doing in currentlySelectedFiles) {
+		
+		let newPath = JPOS.popupSync({
+			
+			title:"Rename/Mode",
+			message:`Rename/Move '${currentlySelectedFiles[doing].jpos_path}' to:`,
+			input:{
+				
+				value:fs.realpathSync(path.join(currentDir))+path.sep,
+				button:"Rename/Move"
+				
+			}
+			
+		}) ;
+		if (newPath === -1 || !Boolean(newPath)) {
+			
+			alert(`'${currentlySelectedFiles[doing].jpos_path}' not changed.`,"A file wasn't changed.") ;
+			continue ;
+			
+		}
+		fs.renameSync(currentlySelectedFiles[doing].jpos_path,newPath) ;
+		renderDir(currentDir) ;
+		
+	}
+	
+}
+
+document.getElementById("button-copy").addEventListener("click",copy) ;
+document.getElementById("button-copy-path").addEventListener("click",copyPath) ;
+let cutFiles = new Array() ;
+let cutFilesClip = new String() ;
+document.getElementById("button-cut").addEventListener("click",cut) ;
+document.getElementById("button-paste").addEventListener("click",paste) ;
+document.getElementById("button-delete").addEventListener("click",del) ;
+document.getElementById("button-new-file").addEventListener("click",newFile) ;
+document.getElementById("button-new-dir").addEventListener("click",newDir) ;
+document.getElementById("button-rename").addEventListener("click",rename) ;
+
+let kbShortcuts = {
+	
+	C:copy,
+	X:cut,
+	V:paste
+	
+} ;
+
+document.body.addEventListener("keydown",e=>{
+	
+	console.log(`${e.ctrlKey?"ctrl+":""}${e.key} pressed.`) ;
+	if (e.ctrlKey) {
+		
+		if (typeof kbShortcuts[e.key.toUpperCase()] === "function") {
+			
+			console.log("Calling func.") ;
+			kbShortcuts[e.key.toUpperCase()]() ;
+			
+		}
+		
+	}
+	
+	else {
+		
+		if (e.key === "Delete") {
+			
+			del() ;
+			
+		}
+		
+	}
+	
 }) ;
+
+for (let doing in shortcuts) {
+	
+	let creating = document.createElement("li") ;
+	creating.classList.add("location") ;
+	creating.innerText = shortcuts[doing][0] ;
+	creating.addEventListener("click",_=>{
+		
+		currentDir = shortcuts[doing][1] ;
+		renderDir(currentDir) ;
+		
+	}) ;
+	sidebar.appendChild(creating) ;
+	
+}
 
 renderDir(currentDir) ;

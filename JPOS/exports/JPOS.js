@@ -14,8 +14,9 @@
 	limitations under the License.
 */
 
-let ipc = require("electron").ipcRenderer ;
-let events = require("events") ;
+const ipc = require("electron").ipcRenderer ;
+const events = require("events") ;
+let keyID = 0 ;
 
 module.exports = {
 	
@@ -38,7 +39,18 @@ module.exports = {
 	},
 	popupSync:(o)=>ipc.sendSync("popup",o,true),
 	window:new(class extends events {})(),
-	close
+	keydown:key=>{
+		
+		return new Promise(resolve=>{
+			
+			let thisID = keyID++ ;
+			ipc.once(`keydown-${thisID}`,(e,status)=>resolve(status)) ;
+			ipc.send("keydown",key,thisID) ;
+			
+		}) ;
+		
+	},
+	keydownSync:key=>ipc.sendSync("keydownSync",key,keyID++)
 	
 } ;
 

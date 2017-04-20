@@ -112,6 +112,7 @@ else {
 	cd = cd.join(path.sep) ;
 	process.chdir(cd) ;
 	let dialogues = require(path.join(process.cwd(),"/resources/dialogues.asar/main.js")) ;
+	require(path.join(process.cwd(),"/resources/JPOS.asar/keytracker-main.js")) ;
 	global.main = null ;
 	let w = new Object() ;
 	let debugmode = false ;
