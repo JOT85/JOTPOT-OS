@@ -69,7 +69,7 @@ function file {
 }
 file "/server"
 file "/JPOS"
-electron_version="1.6.2"
+electron_version="1.6.5"
 electron_file="electron-v$electron_version-linux-$a"
 echo ""
 echo "Downloading precompiled version of electron v$electron_version for linux on $a from 'https://github.com/electron/electron/releases/download/v$electron_version/$electron_file.zip'..."
