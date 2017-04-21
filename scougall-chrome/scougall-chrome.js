@@ -118,7 +118,7 @@ function newTab(url) {
 	tabsElem.insertBefore(t.tab,newtab) ;
 	t.view.partition = "persist:scougallchrome" ;
 	t.view.autosize = true ;
-	t.view.plugins = false ;
+	t.view.plugins = true ;
 	t.view.addEventListener("page-title-updated",e=>t.title=e.title) ;
 	t.view.addEventListener("page-favicon-updated",e=>t.tabImage.src=e.favicons[0]) ;
 	t.view.addEventListener("will-navigate",e=>t.url=e.url) ;
@@ -146,7 +146,7 @@ function newTab(url) {
 	t.view.addEventListener("new-window",e=>{
 		
 		e.preventDefault() ;
-		newTab(e.url) ;
+		setTimeout(_=>newTab(e.url),300) ;
 		
 	}) ;
 	
