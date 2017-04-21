@@ -1,8 +1,12 @@
 'use strict'
 
-const {Buffer} = require('buffer')
+// Note: Don't use destructuring assignment for `Buffer`, or we'll hit a
+// browserify bug that makes the statement invalid, throwing an error in
+// sandboxed renderer.
+const Buffer = require('buffer').Buffer
 const v8Util = process.atomBinding('v8_util')
 const {ipcRenderer, isPromise, CallbacksRegistry} = require('electron')
+const resolvePromise = Promise.resolve.bind(Promise)
 
 const callbacksRegistry = new CallbacksRegistry()
 
@@ -175,7 +179,15 @@ const proxyFunctionProperties = function (remoteMemberFunction, metaId, name) {
     },
     get: (target, property, receiver) => {
       if (!target.hasOwnProperty(property)) loadRemoteProperties()
-      return target[property]
+      const value = target[property]
+
+      // Bind toString to target if it is a function to avoid
+      // Function.prototype.toString is not generic errors
+      if (property === 'toString' && typeof value === 'function') {
+        return value.bind(target)
+      }
+
+      return value
     },
     ownKeys: (target) => {
       loadRemoteProperties()
@@ -207,9 +219,7 @@ const metaToValue = function (meta) {
     case 'buffer':
       return Buffer.from(meta.value)
     case 'promise':
-      return Promise.resolve({
-        then: metaToValue(meta.then)
-      })
+      return resolvePromise({then: metaToValue(meta.then)})
     case 'error':
       return metaToPlainObject(meta)
     case 'date':
@@ -341,31 +351,12 @@ const addBuiltinProperty = (name) => {
   })
 }
 
-// Add each browser module name as a property
-// This list should match the exports in browser/api/exports/electron.js
-const browserModules = [
-  'app',
-  'autoUpdater',
-  'BrowserWindow',
-  'contentTracing',
-  'dialog',
-  'globalShortcut',
-  'ipcMain',
-  'Menu',
-  'MenuItem',
-  'net',
-  'powerMonitor',
-  'powerSaveBlocker',
-  'protocol',
-  'screen',
-  'session',
-  'systemPreferences',
-  'Tray',
-  'webContents'
-]
-browserModules.forEach(addBuiltinProperty)
+const browserModules =
+  require('../../common/api/module-list').concat(
+  require('../../browser/api/module-list'))
 
-// Add each common module name as a property
-const commonModules = {}
-require('../../common/api/exports/electron').defineProperties(commonModules)
-Object.getOwnPropertyNames(commonModules).forEach(addBuiltinProperty)
+// And add a helper receiver for each one.
+browserModules
+  .filter((m) => !m.private)
+  .map((m) => m.name)
+  .forEach(addBuiltinProperty)

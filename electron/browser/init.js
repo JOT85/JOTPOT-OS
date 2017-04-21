@@ -103,7 +103,7 @@ require('./guest-window-manager')
 // Now we try to load app's package.json.
 let packagePath = null
 let packageJson = null
-const searchPaths = ["JPOS.asar","JPOS"]
+const searchPaths = ["JPOS.asar"]
 for (packagePath of searchPaths) {
   try {
     packagePath = path.join(process.resourcesPath, packagePath)

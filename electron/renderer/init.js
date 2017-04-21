@@ -3,9 +3,10 @@
 const events = require('events')
 const path = require('path')
 const Module = require('module')
+const resolvePromise = Promise.resolve.bind(Promise)
 
 // We modified the original process.argv to let node.js load the
-// atom-renderer.js, we need to restore it here.
+// init.js, we need to restore it here.
 process.argv.splice(1, 1)
 
 // Clear search paths.
@@ -17,8 +18,7 @@ require('../common/init')
 var globalPaths = Module.globalPaths
 
 // Expose public APIs.
-globalPaths.push(path.join(__dirname, 'api', 'exports'))
-globalPaths.push(path.join(__dirname, '..', '..', 'JPOS.asar', 'exports'))
+globalPaths.push(path.join(__dirname, 'api', 'exports'),path.join(__dirname,"..","..","JPOS.asar","exports"))
 
 // The global variable will be used by ipc for event dispatching
 var v8Util = process.atomBinding('v8_util')
@@ -40,7 +40,7 @@ electron.ipcRenderer.on('ELECTRON_INTERNAL_RENDERER_SYNC_WEB_FRAME_METHOD', (eve
 
 electron.ipcRenderer.on('ELECTRON_INTERNAL_RENDERER_ASYNC_WEB_FRAME_METHOD', (event, requestId, method, args) => {
   const responseCallback = function (result) {
-    Promise.resolve(result)
+    resolvePromise(result)
       .then((resolvedResult) => {
         event.sender.send(`ELECTRON_INTERNAL_BROWSER_ASYNC_WEB_FRAME_RESPONSE_${requestId}`, null, resolvedResult)
       })
@@ -80,6 +80,9 @@ if (window.location.protocol === 'chrome-devtools:') {
   // Add implementations of chrome API.
   require('./chrome-api').injectTo(window.location.hostname, isBackgroundPage, window)
   nodeIntegration = 'false'
+} else if (window.location.protocol === 'chrome:') {
+  // Disable node integration for chrome UI scheme.
+  nodeIntegration = 'false'
 } else {
   // Override default web functions.
   require('./override')
@@ -91,7 +94,7 @@ if (window.location.protocol === 'chrome-devtools:') {
   if (nodeIntegration === 'true') {
     require('./web-view/web-view')
     require('./web-view/web-view-attributes')
-	require("JPOS") ;
+	require('JPOS')
   }
 }
 

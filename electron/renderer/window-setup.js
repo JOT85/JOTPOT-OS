@@ -24,7 +24,6 @@
 'use strict'
 
 const {defineProperty} = Object
-//let JPOS = require("./api/exports/JPOS.js") ;
 let JPOS = require("JPOS") ;
 
 // Helper function to resolve relative url.
@@ -123,25 +122,23 @@ module.exports = (ipcRenderer, guestInstanceId, openerId, hiddenPage) => {
   }
 
   window.alert = function (message, title) {
-	JPOS.popupSync({
+    JPOS.popupSync({
 		
 		title:title||"JavaScript Alert",
 		message:message,
 		options:["OK"]
 		
 	}) ;
-    //ipcRenderer.sendSync('ELECTRON_BROWSER_WINDOW_ALERT', message, title)
   }
 
   window.confirm = function (message, title) {
-	 return !Boolean(JPOS.popupSync({
+    return !Boolean(JPOS.popupSync({
 		
 		title:title,
 		message:message,
 		options:["OK","Cancel"]
 		
 	})) ;
-    //return ipcRenderer.sendSync('ELECTRON_BROWSER_WINDOW_CONFIRM', message, title)
   }
 
   // But we do not support prompt().
