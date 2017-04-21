@@ -114,11 +114,10 @@ function newTab(url) {
 	t.tab.appendChild(t.tabText) ;
 	tabsElem.insertBefore(t.tab,newtab) ;
 	t.view.partition = "persist:scougallchrome" ;
-	t.view.src = url ;
 	t.view.autosize = true ;
 	t.view.plugins = false ;
-	t.view.webpreferences = "sandbox=yes" ;
 	views.appendChild(t.view) ;
+	t.view.src = url ;
 	t.view.addEventListener("page-title-updated",e=>t.title=e.title) ;
 	t.view.addEventListener("page-favicon-updated",e=>t.tabImage.src=e.favicons[0]) ;
 	t.view.addEventListener("will-navigate",e=>t.url=e.url) ;

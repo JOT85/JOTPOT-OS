@@ -118,7 +118,7 @@ html,body {
 
 .view {
 	
-	display: block;
+	display: flex;
 	width: 100%;
 	height: 100%;
 	position: absolute;
@@ -193,9 +193,9 @@ html,body {
 	
 }
 
-webview::shadow object {
+/*webview::shadow object {
 	
 	width: 100%;
 	height: 100%;
 	
-}
+}*/
