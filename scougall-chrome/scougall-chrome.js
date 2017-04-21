@@ -116,8 +116,6 @@ function newTab(url) {
 	t.view.partition = "persist:scougallchrome" ;
 	t.view.autosize = true ;
 	t.view.plugins = false ;
-	views.appendChild(t.view) ;
-	t.view.src = url ;
 	t.view.addEventListener("page-title-updated",e=>t.title=e.title) ;
 	t.view.addEventListener("page-favicon-updated",e=>t.tabImage.src=e.favicons[0]) ;
 	t.view.addEventListener("will-navigate",e=>t.url=e.url) ;
@@ -181,6 +179,8 @@ function newTab(url) {
 	}
 	
 	t.view.classList.add("active") ;
+	views.appendChild(t.view) ;
+	t.view.src = url ;
 	t.tab.classList.add("active") ;
 	currentTab = thisTab ;
 	

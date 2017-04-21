@@ -38,6 +38,9 @@ let list = document.getElementById("list") ;
 let locationInput = document.getElementById("location") ;
 let box = document.getElementById("box") ;
 let upButton = document.getElementById("up") ;
+let displayedFiles = new Array() ;
+let base = null ;
+let currentSelection = null ;
 
 let sidebar = document.getElementById("sidebar") ;
 let shortcuts = [
@@ -60,6 +63,13 @@ function addSelectListeners(elem,openFunc) {
 		
 		if (currentlySelectedFiles.indexOf(elem) !== -1) {
 			
+			if (base === displayedFiles.indexOf(elem)) {
+				
+				base = null ;
+				currentSelection = null ;
+				
+			}
+			
 			elem.classList.remove("selected") ;
 			currentlySelectedFiles.splice(currentlySelectedFiles.indexOf(elem),1) ;
 			
@@ -78,6 +88,8 @@ function addSelectListeners(elem,openFunc) {
 				
 			}
 			
+			base = displayedFiles.indexOf(elem) ;
+			currentSelection = displayedFiles.indexOf(elem) ;
 			elem.classList.add("selected") ;
 			currentlySelectedFiles.push(elem) ;
 			
@@ -161,6 +173,7 @@ function renderDir(d) {
 	console.log("Rendering",d) ;
 	locationInput.value = d ;
 	list.innerHTML = "" ;
+	displayedFiles = [] ;
 	for (let doing in currentlySelectedFiles) {
 		
 		currentlySelectedFiles[doing].classList.remove("selected") ;
@@ -199,6 +212,7 @@ function renderDir(d) {
 					creating.jpos_type = "err" ;
 					addSelectListeners(creating) ;
 					list.appendChild(creating) ;
+					displayedFiles.push(creating) ;
 					
 				}
 				for (let doing in dirs) {
@@ -218,6 +232,7 @@ function renderDir(d) {
 						
 					}) ;
 					list.appendChild(creating) ;
+					displayedFiles.push(creating) ;
 					
 				}
 				for (let doing in files) {
@@ -235,6 +250,7 @@ function renderDir(d) {
 						
 					}) ;
 					list.appendChild(creating) ;
+					displayedFiles.push(creating) ;
 					
 				}
 				return ;
@@ -245,7 +261,7 @@ function renderDir(d) {
 				
 				if (err) {
 					
-					x.push([dir[doing],"Error stating"]) ;
+					x.push([dir[doing],"Error reading: "+err.code]) ;
 					next() ;
 					giveMeErrors(err) ;
 					return ;
@@ -622,7 +638,122 @@ let kbShortcuts = {
 	
 	C:copy,
 	X:cut,
-	V:paste
+	V:paste,
+	ARROWDOWN:_=>list.scrollTop+=25,
+	ARROWUP:_=>list.scrollTop-=25
+	
+} ;
+
+let keyBinds = {
+	
+	DELETE:del,
+	ARROWDOWN:e=>{
+		
+		console.log(base,currentSelection) ;
+		e.preventDefault() ;
+		let currentIndex = currentSelection ;
+		if (currentIndex + 1 < displayedFiles.length) {
+			
+			if (!e.shiftKey) {
+				
+				for (let doing in currentlySelectedFiles) {
+					
+					currentlySelectedFiles[doing].classList.remove("selected") ;
+					
+				}
+				base = currentIndex + 1 ;
+				currentSelection = currentIndex + 1 ;
+				currentlySelectedFiles = [displayedFiles[base]] ;
+				
+			}
+			
+			else {
+				
+				if (base !== null && currentIndex < base) {
+					
+					currentlySelectedFiles.shift().classList.remove("selected") ;
+					currentSelection = currentIndex + 1 ;
+					return ;
+					
+				}
+				
+				currentSelection = currentIndex + 1 ;
+				currentlySelectedFiles.push(displayedFiles[currentSelection]) ;
+				
+			}
+			
+			displayedFiles[currentIndex+1].classList.add("selected") ;
+			
+			let rect = displayedFiles[currentIndex+1].getBoundingClientRect() ;
+			if (rect.top < 130) {
+				
+				displayedFiles[currentIndex+1].scrollIntoView(true) ;
+				
+			}
+			
+			else if (rect.bottom > window.innerHeight) {
+				
+				displayedFiles[currentIndex+1].scrollIntoView(false) ;
+				
+			}
+			
+		}
+		
+	},
+	ARROWUP:e=>{
+		
+		console.log(base,currentSelection) ;
+		e.preventDefault() ;
+		
+		let currentIndex = currentSelection ;
+		if (currentIndex > 0) {
+			
+			if (!e.shiftKey) {
+				
+				for (let doing in currentlySelectedFiles) {
+					
+					currentlySelectedFiles[doing].classList.remove("selected") ;
+					
+				}
+				base = currentIndex - 1 ;
+				currentSelection = currentIndex - 1 ;
+				currentlySelectedFiles = [displayedFiles[base]] ;
+				
+			}
+			
+			else {
+				
+				if (base !== null && currentIndex > base) {
+					
+					let rm = currentlySelectedFiles.pop().classList.remove("selected") ;
+					currentSelection = currentIndex - 1 ;
+					return ;
+					
+				}
+				
+				currentSelection = currentIndex - 1 ;
+				currentlySelectedFiles.unshift(displayedFiles[currentIndex-1]) ;
+				
+			}
+			
+			displayedFiles[currentIndex-1].classList.add("selected") ;
+			
+			let rect = displayedFiles[currentIndex-1].getBoundingClientRect() ;
+			if (rect.top < 130) {
+				
+				displayedFiles[currentIndex-1].scrollIntoView(true) ;
+				
+			}
+			
+			else if (rect.bottom > window.innerHeight) {
+				
+				displayedFiles[currentIndex-1].scrollIntoView(false) ;
+				
+			}
+			
+		}
+		
+	}
 	
 } ;
 
@@ -633,8 +764,7 @@ document.body.addEventListener("keydown",e=>{
 		
 		if (typeof kbShortcuts[e.key.toUpperCase()] === "function") {
 			
-			console.log("Calling func.") ;
-			kbShortcuts[e.key.toUpperCase()]() ;
+			kbShortcuts[e.key.toUpperCase()](e) ;
 			
 		}
 		
@@ -642,9 +772,9 @@ document.body.addEventListener("keydown",e=>{
 	
 	else {
 		
-		if (e.key === "Delete") {
+		if (typeof keyBinds[e.key.toUpperCase()] === "function") {
 			
-			del() ;
+			keyBinds[e.key.toUpperCase()](e) ;
 			
 		}
 		
