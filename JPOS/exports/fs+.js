@@ -41,16 +41,15 @@ module.exports.copy = (file1,file2,overwrite=2) => {
 	
 	return new Promise((resolve,rejectA)=>{
 		
-		function reject(err,fds=[]) {
+		function reject(err,...fds) {
 			
+			console.log("Reject called:",fds) ;
 			let doing = -1 ;
 			function next() {
 				
 				doing++ ;
-				console.log(doing,fds.length) ;
 				if (doing >= fds.length) {
 					
-					console.log("NOOOO") ;
 					rejectA(err) ;
 					
 				}
@@ -62,12 +61,7 @@ module.exports.copy = (file1,file2,overwrite=2) => {
 				}
 				
 			}
-			
-			if (fds.length) {
-				
-				next() ;
-				
-			}
+			next() ;
 			
 		}
 		
@@ -101,7 +95,7 @@ module.exports.copy = (file1,file2,overwrite=2) => {
 							
 							else {
 								
-								fs.open(file2,"r",(err,fd2)=>{
+								fs.open(file2,"r+",(err,fd2)=>{
 									
 									let go = (check=true) => {
 										
@@ -125,10 +119,13 @@ module.exports.copy = (file1,file2,overwrite=2) => {
 												
 											}
 											
+											console.log("Ya know, are you sure we can do this???") ;
 											fs.futimes(fd2,stats1.atime,stats1.mtime,err=>{
 												
+												console.log("Yep!") ;
 												if (err) {
 													
+													console.log("Erm, accualy, on second thoughts...") ;
 													reject(err,fd2) ;
 													
 												}
@@ -178,16 +175,19 @@ module.exports.copy = (file1,file2,overwrite=2) => {
 																					let doing = -1 ;
 																					let next =_=> {
 																						
+																						console.log("NEXT!") ;
 																						doing++ ;
 																						
 																						if (doing >= dir.length) {
 																							
+																							console.log("Copy complete...") ;
 																							resolve() ;
 																							
 																						}
 																						
 																						else {
 																							
+																							console.log("When I said fully...") ;
 																							module.exports.copy(path.join(file1,dir[doing]),path.join(file2,dir[doing]),overwrite).then(next).catch(reject) ;
 																							
 																						}
@@ -233,7 +233,7 @@ module.exports.copy = (file1,file2,overwrite=2) => {
 												
 												else {
 													
-													fs.open(file2,"r",(err,fd)=>{
+													fs.open(file2,"r+",(err,fd)=>{
 														
 														if (err) {
 															
