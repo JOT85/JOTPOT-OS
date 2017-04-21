@@ -116,7 +116,7 @@ function newTab(url) {
 	t.view.partition = "persist:scougallchrome" ;
 	t.view.src = url ;
 	t.view.autosize = true ;
-	t.view.plugins = true ;
+	t.view.plugins = false ;
 	views.appendChild(t.view) ;
 	t.view.addEventListener("page-title-updated",e=>t.title=e.title) ;
 	t.view.addEventListener("page-favicon-updated",e=>t.tabImage.src=e.favicons[0]) ;

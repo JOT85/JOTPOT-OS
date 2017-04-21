@@ -1,8 +1,6 @@
 const {ipcRenderer} = require('electron')
 const {runInThisContext} = require('vm')
 
-console.log("My guest instance ID: ",process.guestInstanceId) ;
-
 // Check whether pattern matches.
 // https://developer.chrome.com/extensions/match_patterns
 const matchesPattern = function (pattern) {

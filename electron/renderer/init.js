@@ -5,6 +5,9 @@ const path = require('path')
 const Module = require('module')
 const resolvePromise = Promise.resolve.bind(Promise)
 
+console.log("My guest instance ID: ",process.guestInstanceId) ;
+console.log("Oh, and argv:",process.argv) ;
+
 // We modified the original process.argv to let node.js load the
 // init.js, we need to restore it here.
 process.argv.splice(1, 1)
@@ -71,6 +74,7 @@ for (let arg of process.argv) {
     isBackgroundPage = true
   }
 }
+console.log("My guest instance ID now: ",process.guestInstanceId) ;
 
 if (window.location.protocol === 'chrome-devtools:') {
   // Override some inspector APIs.
