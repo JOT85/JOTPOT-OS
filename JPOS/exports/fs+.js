@@ -95,7 +95,7 @@ module.exports.copy = (file1,file2,overwrite=2) => {
 							
 							else {
 								
-								fs.open(file2,"r+",(err,fd2)=>{
+								fs.open(file2,"r",(err,fd2)=>{
 									
 									let go = (check=true) => {
 										
@@ -233,7 +233,7 @@ module.exports.copy = (file1,file2,overwrite=2) => {
 												
 												else {
 													
-													fs.open(file2,"r+",(err,fd)=>{
+													fs.open(file2,"r",(err,fd)=>{
 														
 														if (err) {
 															
