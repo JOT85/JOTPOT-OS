@@ -47,9 +47,10 @@ module.exports.copy = (file1,file2,overwrite=2) => {
 			function next() {
 				
 				doing++ ;
-				
+				console.log(doing,fds.length) ;
 				if (doing >= fds.length) {
 					
+					console.log("NOOOO") ;
 					rejectA(err) ;
 					
 				}
@@ -61,7 +62,12 @@ module.exports.copy = (file1,file2,overwrite=2) => {
 				}
 				
 			}
-			next() ;
+			
+			if (fds.length) {
+				
+				next() ;
+				
+			}
 			
 		}
 		
@@ -95,7 +101,7 @@ module.exports.copy = (file1,file2,overwrite=2) => {
 							
 							else {
 								
-								fs.open(file2,"r+",(err,fd2)=>{
+								fs.open(file2,"r",(err,fd2)=>{
 									
 									let go = (check=true) => {
 										
@@ -227,7 +233,7 @@ module.exports.copy = (file1,file2,overwrite=2) => {
 												
 												else {
 													
-													fs.open(file2,"r+",(err,fd)=>{
+													fs.open(file2,"r",(err,fd)=>{
 														
 														if (err) {
 															
