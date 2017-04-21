@@ -41,7 +41,7 @@ module.exports.copy = (file1,file2,overwrite=2) => {
 	
 	return new Promise((resolve,rejectA)=>{
 		
-		function reject(err,fds) {
+		function reject(err,fds=[]) {
 			
 			let doing = -1 ;
 			function next() {

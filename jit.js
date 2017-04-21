@@ -133,4 +133,9 @@ package("electron").then(_=>package("JPOS"))
 		
 	}
 	
+}).catch(err=>{
+	
+	console.warn("Error whilst packaging:") ;
+	console.warn(err) ;
+	
 }) ;
