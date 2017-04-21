@@ -143,12 +143,7 @@ function newTab(url) {
 		inited = true ;
 		
 	}) ;
-	t.view.addEventListener("new-window",e=>{
-		
-		e.preventDefault() ;
-		setTimeout(_=>newTab(e.url),300) ;
-		
-	}) ;
+	t.view.addEventListener("new-window",e=>newTab(e.url)) ;
 	
 	
 	t.isLoading = false ;
