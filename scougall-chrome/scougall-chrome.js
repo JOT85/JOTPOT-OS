@@ -86,8 +86,10 @@ function newTab(url) {
 		
 	} ;
 	let thisTab = tabs.push(t) - 1 ;
+	console.info("Creating",thisTab) ;
 	let closeThis =_=> {
 		
+		console.info("Closing",thisTab) ;
 		tabsElem.removeChild(t.tab) ;
 		views.removeChild(t.view) ;
 		tabs[thisTab] = null ;
@@ -96,6 +98,7 @@ function newTab(url) {
 		currentTab = -1 ;
 		
 	} ;
+	t.close = closeThis ;
 	t.tab.classList.add("tab") ;
 	t.tab.addEventListener("click",_=>goToTab(thisTab)) ;
 	t.tab.addEventListener("mouseup",e=>{
@@ -296,3 +299,36 @@ else {
 	newTab(homePage) ;
 	
 }
+
+let keyBinds = {} ;
+let kbShortcuts = {
+	
+	T:_=>newTab(homePage),
+	W:_=>tabs[currentTab].close()
+	
+} ;
+
+document.body.addEventListener("keydown",e=>{
+	
+	console.log(`${e.ctrlKey?"ctrl+":""}${e.key} pressed.`) ;
+	if (e.ctrlKey) {
+		
+		if (typeof kbShortcuts[e.key.toUpperCase()] === "function") {
+			
+			kbShortcuts[e.key.toUpperCase()](e) ;
+			
+		}
+		
+	}
+	
+	else {
+		
+		if (typeof keyBinds[e.key.toUpperCase()] === "function") {
+			
+			keyBinds[e.key.toUpperCase()](e) ;
+			
+		}
+		
+	}
+	
+}) ;
