@@ -117,6 +117,7 @@ function newTab(url) {
 	t.view.src = url ;
 	t.view.autosize = true ;
 	t.view.plugins = false ;
+	t.view.webpreferences = "sandbox=yes" ;
 	views.appendChild(t.view) ;
 	t.view.addEventListener("page-title-updated",e=>t.title=e.title) ;
 	t.view.addEventListener("page-favicon-updated",e=>t.tabImage.src=e.favicons[0]) ;
