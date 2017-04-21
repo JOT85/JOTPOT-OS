@@ -93,6 +93,69 @@ function addSelectListeners(elem,openFunc) {
 	
 }
 
+function makeSections(elem,sections,marker="") {
+	
+	for (let doing in sections) {
+		
+		let creating = document.createElement("div") ;
+		creating.classList.add("segment") ;
+		creating.classList.add(`segment-${doing}`) ;
+		if (marker) {
+			
+			console.log("Adding marker") ;
+			creating.classList.add(marker) ;
+			
+		}
+		creating.innerText = sections[doing] ;
+		elem.appendChild(creating) ;
+		
+	}
+	
+}
+
+function pad(s,p="0",l=2) {
+	
+	s = String(s) ;
+	while (s.length < l) {
+		
+		s = `${p}${s}` ;
+		
+	}
+	return s ;
+	
+}
+
+function formatTime(t) {
+	
+	t = new Date(t) ;
+	return `${pad(t.getDate())}/${pad(t.getMonth())}/${pad(t.getFullYear())} ${pad(t.getHours())}:${pad(t.getMinutes())}` ;
+	
+}
+
+let sizes = ["B","KB","MB","GB","TB","PB"] ;
+function formatSize(size=0) {
+	
+	let current = 0 ;
+	while (current < sizes.length && size > 1023) {
+		
+		size /= 1024 ;
+		current++ ;
+		
+	}
+	if (current > 0) {
+		
+		size = size.toFixed(3) ;
+		
+	}
+	else {
+		
+		size = size.toFixed(0) ;
+		
+	}
+	return `${size} ${sizes[current]}` ;
+	
+}
+
 function renderDir(d) {
 	
 	console.log("Rendering",d) ;
@@ -130,8 +193,9 @@ function renderDir(d) {
 					let creating = document.createElement("li") ;
 					creating.classList.add("item") ;
 					creating.classList.add("file-err") ;
-					creating.innerText = x[doing] ;
-					creating.jpos_path = path.join(d,x[doing]) ;
+					//creating.innerText = x[doing][0] ;
+					makeSections(creating,x[doing],"err-segment") ;
+					creating.jpos_path = path.join(d,x[doing][0]) ;
 					creating.jpos_type = "err" ;
 					addSelectListeners(creating) ;
 					list.appendChild(creating) ;
@@ -142,12 +206,13 @@ function renderDir(d) {
 					let creating = document.createElement("li") ;
 					creating.classList.add("item") ;
 					creating.classList.add("dir") ;
-					creating.innerText = dirs[doing] ;
-					creating.jpos_path = path.join(d,dirs[doing]) ;
+					//creating.innerText = dirs[doing] ;
+					makeSections(creating,dirs[doing]) ;
+					creating.jpos_path = path.join(d,dirs[doing][0]) ;
 					creating.jpos_type = "dir" ;
 					addSelectListeners(creating,_=>{
 						
-						currentDir = path.join(d,dirs[doing]) ;
+						currentDir = path.join(d,dirs[doing][0]) ;
 						//locationInput.value = currentDir ;
 						renderDir(currentDir) ;
 						
@@ -160,12 +225,13 @@ function renderDir(d) {
 					let creating = document.createElement("li") ;
 					creating.classList.add("item") ;
 					creating.classList.add("file") ;
-					creating.innerText = files[doing] ;
-					creating.jpos_path = path.join(d,files[doing]) ;
+					//creating.innerText = files[doing] ;
+					makeSections(creating,files[doing]) ;
+					creating.jpos_path = path.join(d,files[doing][0]) ;
 					creating.jpos_type = "file" ;
 					addSelectListeners(creating,_=>{
 						
-						JPOS.open(path.join(currentDir,files[doing])) ;
+						JPOS.open(path.join(currentDir,files[doing][0])) ;
 						
 					}) ;
 					list.appendChild(creating) ;
@@ -179,7 +245,7 @@ function renderDir(d) {
 				
 				if (err) {
 					
-					x.push(dir[doing]) ;
+					x.push([dir[doing],"Error stating"]) ;
 					next() ;
 					giveMeErrors(err) ;
 					return ;
@@ -188,13 +254,13 @@ function renderDir(d) {
 				
 				else if (stats.isDirectory()) {
 					
-					dirs.push(dir[doing]) ;
+					dirs.push([dir[doing],formatTime(stats.mtime),"Directory"]) ;
 					
 				}
 				
 				else {
 					
-					files.push(dir[doing]) ;
+					files.push([dir[doing],formatTime(stats.mtime),formatSize(stats.size)]) ;
 					
 				}
 				

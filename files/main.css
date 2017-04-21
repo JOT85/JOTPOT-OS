@@ -251,3 +251,38 @@ ul {
 	right: 40px;
 	
 }
+
+.segment {
+	
+	display: inline-block;
+	width: 30%;
+	
+}
+
+.segment-2 {
+	
+	text-align: right;
+	width: 100px;
+	
+}
+
+.segment-1.err-segment {
+	
+	text-align: right;
+	width: 250px;
+	
+}
+
+.segment-1 {
+	
+	text-align: center;
+	width: 150px;
+	
+}
+
+.segment-0 {
+	
+	text-align: left;
+	width: calc(100% - 300px);
+	
+}
